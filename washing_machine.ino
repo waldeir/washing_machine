@@ -603,7 +603,7 @@ void delicateWash(){
   // Wash time
   totalTime = 9*((float)2*hits*(spin + pause)/(float)1000 + soak);
   // Wash time + centrifugue time (guessing that the tank takes
-  // 60s to empty)
+  // 120s to empty)
 
   totalTime = totalTime + 3*(120 + 20 + 180);
 
