@@ -271,7 +271,7 @@ void simpleWash(){
 
   // Wash time + centrifugue time (guessing that the tank takes
   // 60s to empty)
-  totalTime = totalTime + 120 + 20 + 180;
+  totalTime = totalTime + 120 + 14 + 180;
 
   updateTime(totalTime);
   
@@ -299,7 +299,7 @@ void justCentrifugue(){
   
   // Estimating cicle time:========================\\
 
-  totalTime = (120 + 20 + 180);
+  totalTime = (120 + 14 + 180);
 
 
   updateTime(totalTime);
@@ -364,7 +364,7 @@ void centrifuge(){
   digitalWrite(motorCCW,HIGH);
   delay(3000);
   digitalWrite(motorCCW, LOW);
-  delay(2000);
+  delay(500);
   }
 
   digitalWrite(motorCCW,HIGH);
@@ -488,7 +488,7 @@ void normalWashing(){
   // Wash time + centrifugue time (guessing that the tank takes
   // 60s to empty)
 
-  totalTime = totalTime + 3*(120 + 20 + 180);
+  totalTime = totalTime + 3*(120 + 14 + 180);
 
   // Wash time + tankFill
   totalTime = totalTime + 2*timeTankFlood;
@@ -517,7 +517,7 @@ void normalWashing(){
   centrifuge();
 
   // Update Time ==============================
-  totalTime = totalTime - (120 + 20 + 180);
+  totalTime = totalTime - (120 + 14 + 180);
   updateTime(totalTime);
       
   //===========================================
@@ -548,7 +548,7 @@ void normalWashing(){
   disp.print("Passo 6 de 9        ");
   centrifuge();
   // Update Time ==============================
-  totalTime = totalTime - (120 + 20 + 180);
+  totalTime = totalTime - (120 + 14 + 180);
   updateTime(totalTime);
       
   //===========================================
@@ -605,7 +605,7 @@ void delicateWash(){
   // Wash time + centrifugue time (guessing that the tank takes
   // 120s to empty)
 
-  totalTime = totalTime + 3*(120 + 20 + 180);
+  totalTime = totalTime + 3*(120 + 14 + 180);
 
   // Wash time + tankFill
   totalTime = totalTime + 2*timeTankFlood;
@@ -629,7 +629,7 @@ void delicateWash(){
   centrifuge();
 
   // Update Time ==============================
-  totalTime = totalTime - (120 + 20 + 180);
+  totalTime = totalTime - (120 + 14 + 180);
   updateTime(totalTime);
   //===========================================
   disp.setCursor(0,2);
@@ -655,7 +655,7 @@ void delicateWash(){
   disp.print("Passo 6 de 9        ");
   centrifuge();
   // Update Time ==============================
-  totalTime = totalTime - (120 + 20 + 180);
+  totalTime = totalTime - (120 + 14 + 180);
   updateTime(totalTime);
 
   disp.setCursor(0,2);
