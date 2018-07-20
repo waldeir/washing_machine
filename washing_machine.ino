@@ -530,8 +530,7 @@ void normalWashing(){
       // Update Time ==============================
       totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
       
-      Serial.println( ((float)2*hits*(spin + pause)/(float)1000 + soak) );
-      Serial.println( totalTime );
+
       updateTime(totalTime);
       
       //===========================================
