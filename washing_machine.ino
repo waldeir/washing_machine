@@ -304,7 +304,7 @@ void simpleWash(){
 }
 
 void beep(unsigned char delayms){
-  analogWrite(beepPin, 100);      // Almost any value can be used except 0 and 255
+  analogWrite(beepPin, 150);      // Almost any value can be used except 0 and 255
                            // experiment to get the best tone
   delay(delayms);          // wait for a delayms ms
   analogWrite(beepPin, 0);       // 0 turns it off
