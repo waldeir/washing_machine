@@ -10,6 +10,7 @@ const int pressostato = 5;
 const int Button1 = 4;
 const int Button2 = 2;
 const int Button3 = 3;
+const int beepPin = 11;
 int TankStatus; // 1 is full and 0 is empty
 //int timeTankFull = 0; // Time the tank takes to fill
 //int timeWashing = 0; // Time spent in washing step
@@ -287,10 +288,30 @@ void simpleWash(){
   disp.setCursor(0,2);
   disp.print("Passo 3 de 3        ");
   centrifuge();
+
+  disp.clear();
+  disp.setCursor(0,2);
+  disp.print("   FIM DO CICLO     ");  
+
+  beep(50);
+  beep(50);
+  beep(50);
+  beep(1000);
+  beep(500);
+  beep(1000);
   
   
 }
 
+void beep(unsigned char delayms){
+  analogWrite(beepPin, 100);      // Almost any value can be used except 0 and 255
+                           // experiment to get the best tone
+  delay(delayms);          // wait for a delayms ms
+  analogWrite(beepPin, 0);       // 0 turns it off
+  delay(delayms);          // wait for a delayms ms   
+}
+
+  
 void justCentrifugue(){
 
   disp.clear();
@@ -310,6 +331,17 @@ void justCentrifugue(){
   disp.setCursor(0,2);
   disp.print("Passo 1 de 1        ");
   centrifuge();
+  
+  disp.clear();
+  disp.setCursor(0,2);
+  disp.print("   FIM DO CICLO     ");  
+
+  beep(50);
+  beep(50);
+  beep(50);
+  beep(1000);
+  beep(500);
+  beep(1000);
   
   
 }
@@ -580,6 +612,17 @@ void normalWashing(){
   disp.setCursor(0,2);
   disp.print("Passo 9 de 9        ");
   centrifuge();
+
+  disp.clear();
+  disp.setCursor(0,2);
+  disp.print("   FIM DO CICLO     ");  
+
+  beep(50);
+  beep(50);
+  beep(50);
+  beep(1000);
+  beep(500);
+  beep(1000);
   
   
 }
@@ -680,6 +723,17 @@ void delicateWash(){
   disp.setCursor(0,2);
   disp.print("Passo 9 de 9        ");
   centrifuge();
+
+  disp.clear();
+  disp.setCursor(0,2);
+  disp.print("   FIM DO CICLO     ");  
+
+  beep(50);
+  beep(50);
+  beep(50);
+  beep(1000);
+  beep(500);
+  beep(1000);
   
 }
   
