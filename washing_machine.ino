@@ -249,7 +249,19 @@ void updateTime(int timeC){
       disp.print("min");
 }
 
+void endBeep(){
+  disp.clear();
+  disp.setCursor(0,0);
+  disp.print("TRABALHO TERMINADO!");
 
+  beep(2000);
+  beep(2000);
+  beep(2000);
+
+  while(1){
+    delay(1000);
+  }
+}
 
 void simpleWash(){
 
@@ -293,9 +305,7 @@ void simpleWash(){
   disp.print("Passo 3 de 3        ");
   centrifuge();
 
-  disp.clear();
-  disp.setCursor(0,2);
-  disp.print("   FIM DO CICLO     ");  
+  endBeep(); 
 
 
   
@@ -331,9 +341,7 @@ void justCentrifugue(){
   disp.print("Passo 1 de 1        ");
   centrifuge();
   
-  disp.clear();
-  disp.setCursor(0,2);
-  disp.print("   FIM DO CICLO     ");  
+  endBeep();
 
   
   
@@ -400,6 +408,7 @@ void errorTank(){
   disp.clear();
   disp.setCursor(0,0);
   disp.print("       ERRO!");
+  disp.setCursor(0,1);
   disp.print("O tanque não enche");
 
   for (int i = 0;i<20;i++){
@@ -554,6 +563,8 @@ void normalWashing(){
       updateTime(totalTime);
       
       //===========================================
+
+   endBeep();
       
   }
 
@@ -732,9 +743,7 @@ void delicateWash(){
   disp.print("Passo 9 de 9        ");
   centrifuge();
 
-  disp.clear();
-  disp.setCursor(0,2);
-  disp.print("   FIM DO CICLO     ");  
+  endBeep();
 
 
   
