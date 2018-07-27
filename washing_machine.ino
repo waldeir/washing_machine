@@ -1,62 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #include <LiquidCrystal.h>                             // Lib for the lcd display
 
 
@@ -188,7 +129,7 @@ void menu(){
       // only toggle the LED if the new button state is HIGH
       if (buttonStateButton1 == HIGH) {
       
-            if (meIndex == 4  ){ meIndex = 0;}
+            if (meIndex == 5  ){ meIndex = 0;}
             meIndex++;   
             printMenu(meIndex);
               
@@ -263,12 +204,15 @@ void menu(){
         simpleWash();
         break;
     case 4:
-        delicateWash();
+        doubleWash();
         break;
     case 5:
-        normalWashing();
+        delicateWash();
         break;
     case 6:
+        normalWashing();
+        break;
+    case 7:
         simpleWash();
         break;
     
@@ -322,6 +266,87 @@ void endBeep(){
   }
 }
 
+void doubleWash(){
+  
+  int totalTime;
+  int hits = 60;
+  int spin = 450;
+  int pause = 200;
+  int soak = 300;
+  disp.clear();
+  disp.setCursor(0,0);
+  disp.print("ENXAGUE SIMPLES");
+  
+  disp.setCursor(0,2);
+  disp.print("Passo 1 de 6        ");
+  timeTankFlood = fillTankSoapV();
+
+  if (timeTankFlood == -1){
+    errorTank();
+  }
+
+  // Estimating cicle time:
+  // Wash time
+  totalTime = 6*((float)2*hits*(spin + pause)/(float)1000 + soak);
+
+  // Wash time + centrifugue time (guessing that the tank takes
+  // 120s to empty)
+  totalTime = totalTime + 2*(120   + 180) + timeTankFlood;
+
+  updateTime(totalTime);
+  
+  disp.setCursor(0,2);
+  disp.print("Passo 2 de 6        ");
+  for (int i=0;i<3;i++){
+      wash(hits, spin, pause, soak);
+
+      totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
+      updateTime(totalTime);
+  }
+
+  disp.setCursor(0,2);
+  disp.print("Passo 3 de 6        ");
+  centrifuge();
+  totalTime = totalTime - 120  - 180;
+  updateTime(totalTime);
+
+  disp.setCursor(0,2);
+  disp.print("Passo 4 de 6        ");
+  
+  timeTankFlood = fillTankSoftV();
+  
+  if (timeTankFlood == -1){
+     errorTank();
+  }
+
+  totalTime = totalTime - timeTankFlood;
+  updateTime(totalTime);
+  
+
+  disp.setCursor(0,2);
+  disp.print("Passo 5 de 6        ");
+  for (int i=0;i<3;i++){
+      wash(hits, spin, pause, soak);
+
+      totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
+      updateTime(totalTime);
+  }
+
+
+  disp.setCursor(0,2);
+  disp.print("Passo 6 de 6        ");
+  centrifuge();
+
+
+  endBeep(); 
+
+
+  
+  
+}
+  
+
+
 void simpleWash(){
 
   int totalTime;
@@ -346,7 +371,7 @@ void simpleWash(){
   totalTime = 3*((float)2*hits*(spin + pause)/(float)1000 + soak);
 
   // Wash time + centrifugue time (guessing that the tank takes
-  // 60s to empty)
+  // 120s to empty)
   totalTime = totalTime + 120   + 180;
 
   updateTime(totalTime);
@@ -423,14 +448,18 @@ void justCentrifugue(){
           break;
           
       case 4:
+          disp.print("ENXAGUE DUPLO      ");
+          break;
+          
+      case 5:
           disp.print("DELICADA           ");
           break;
 
-      case 5:
+      case 6:
           disp.print("NORMAL             ");
           break;
 
-      case 6:
+      case 7:
           disp.print("APENAS CENTRIFUGAR ");
           break;
     }
