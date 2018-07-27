@@ -266,6 +266,10 @@ void simpleWash(){
   disp.print("Passo 1 de 3        ");
   timeTankFlood = fillTankSoapV();
 
+  if (timeTankFlood == -1){
+    errorTank();
+  }
+
   // Estimating cicle time:
   // Wash time
   totalTime = 3*((float)2*hits*(spin + pause)/(float)1000 + soak);
@@ -293,12 +297,7 @@ void simpleWash(){
   disp.setCursor(0,2);
   disp.print("   FIM DO CICLO     ");  
 
-  beep(50);
-  beep(50);
-  beep(50);
-  beep(1000);
-  beep(500);
-  beep(1000);
+
   
   
 }
@@ -336,12 +335,6 @@ void justCentrifugue(){
   disp.setCursor(0,2);
   disp.print("   FIM DO CICLO     ");  
 
-  beep(50);
-  beep(50);
-  beep(50);
-  beep(1000);
-  beep(500);
-  beep(1000);
   
   
 }
@@ -402,6 +395,25 @@ void centrifuge(){
   digitalWrite(pump,LOW);
 }
 
+
+void errorTank(){
+  disp.clear();
+  disp.setCursor(0,0);
+  disp.print("       ERRO!");
+  disp.print("O tanque não enche");
+
+  for (int i = 0;i<20;i++){
+    beep(1000);
+  }
+    
+  while(1){
+    delay(1000);
+  }
+}
+
+
+
+
 int fillTankSoapV(){
   int timeTankFull = 0;
   // fill tank using the soap valve
@@ -414,7 +426,11 @@ int fillTankSoapV(){
     digitalWrite(soapValve,HIGH);
     delay(1000);
     timeTankFull = timeTankFull + 1;
-    // To do: put a timer to not overfill the tank
+ 
+    if (timeTankFull > 1380){
+      return -1;
+    }
+      
     }
   digitalWrite(soapValve,LOW);
   Serial.println("Fechando válvula de sabão");
@@ -446,6 +462,10 @@ int fillTankSoftV(){
     delay(1000);
     timeTankFull = timeTankFull + 1;
     // To do: put a timer to not overfill the tank
+    if (timeTankFull > 1380){
+      return -1;
+    }
+    
     }
     digitalWrite(softenerValve,LOW);
 
@@ -610,12 +630,7 @@ void normalWashing(){
   disp.setCursor(0,2);
   disp.print("   FIM DO CICLO     ");  
 
-  beep(50);
-  beep(50);
-  beep(50);
-  beep(1000);
-  beep(500);
-  beep(1000);
+
   
   
 }
@@ -721,12 +736,7 @@ void delicateWash(){
   disp.setCursor(0,2);
   disp.print("   FIM DO CICLO     ");  
 
-  beep(50);
-  beep(50);
-  beep(50);
-  beep(1000);
-  beep(500);
-  beep(1000);
+
   
 }
   
