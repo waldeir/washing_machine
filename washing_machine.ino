@@ -73,6 +73,12 @@ menu();
 void menu(){
   disp.clear();
   disp.setCursor(0,0);
+  disp.print("  FIRMWARE VERSION  ");
+  disp.setCursor(0,1);
+  disp.print("        1.0         ");
+  delay(3000);
+  disp.clear();
+  disp.setCursor(0,0);
   disp.print("Selecione o programa");
 
   int menuLength = 5;
