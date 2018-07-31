@@ -129,7 +129,7 @@ void menu(){
       // only toggle the LED if the new button state is HIGH
       if (buttonStateButton1 == HIGH) {
       
-            if (meIndex == 5  ){ meIndex = 0;}
+            if (meIndex == 6  ){ meIndex = 0;}
             meIndex++;   
             printMenu(meIndex);
               
@@ -207,13 +207,16 @@ void menu(){
         doubleWash();
         break;
     case 5:
-        delicateWash();
+        justSoak();
         break;
     case 6:
-        normalWashing();
+        delicateWash();
         break;
     case 7:
-        simpleWash();
+        normalWashing();
+        break;
+    case 8:
+        justCentrifugue();
         break;
     
     
@@ -350,6 +353,46 @@ void doubleWash(){
 }
   
 
+void justSoak(){
+
+  int totalTime;
+  int hits = 60;
+  int spin = 450;
+  int pause = 200;
+  int soak = 300;
+  disp.clear();
+  disp.setCursor(0,0);
+  disp.print("DEIXAR DE MOLHO     ");
+  
+  disp.setCursor(0,2);
+  disp.print("Passo 1 de 2        ");
+  timeTankFlood = fillTankSoapV();
+
+  if (timeTankFlood == -1){
+    errorTank();
+  }
+
+  // Estimating cicle time:
+  // Wash time
+  totalTime = 3*((float)2*hits*(spin + pause)/(float)1000 + soak);
+
+  updateTime(totalTime);
+  
+  disp.setCursor(0,2);
+  disp.print("Passo 2 de 2        ");
+  for (int i=0;i<3;i++){
+      wash(hits, spin, pause, soak);
+
+      totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
+      updateTime(totalTime);
+  }
+
+  endBeep(); 
+
+
+  
+  
+}
 
 void simpleWash(){
 
@@ -440,7 +483,7 @@ void justCentrifugue(){
   void printMenuItem(int menuIndex){
     switch (menuIndex){
       case 1:
-          disp.print("NORMAL             ");
+          disp.print("LAVAGEM COMPLETA   ");
          break;
           
       case 2:
@@ -454,16 +497,20 @@ void justCentrifugue(){
       case 4:
           disp.print("ENXAGUE DUPLO      ");
           break;
-          
+
       case 5:
+          disp.print("DEIXAR DE MOLHO    ");
+          break;
+          
+      case 6:
           disp.print("DELICADA           ");
           break;
 
-      case 6:
+      case 7:
           disp.print("NORMAL             ");
           break;
 
-      case 7:
+      case 8:
           disp.print("APENAS CENTRIFUGAR ");
           break;
     }
