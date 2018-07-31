@@ -72,11 +72,11 @@ menu();
 
 void menu(){
   disp.clear();
-  disp.setCursor(0,0);
-  disp.print("  FIRMWARE VERSION  ");
   disp.setCursor(0,1);
+  disp.print("  FIRMWARE VERSION  ");
+  disp.setCursor(0,2);
   disp.print("        1.0         ");
-  delay(3000);
+  delay(2000);
   disp.clear();
   disp.setCursor(0,0);
   disp.print("Selecione o programa");
@@ -513,7 +513,7 @@ void justCentrifugue(){
           break;
 
       case 7:
-          disp.print("NORMAL             ");
+          disp.print("LAVAGEM COMPLETA   ");
           break;
 
       case 8:
