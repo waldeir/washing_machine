@@ -254,8 +254,12 @@ void updateTime(int timeC){
 
 void endBeep(){
   disp.clear();
-  disp.setCursor(0,0);
-  disp.print("TRABALHO TERMINADO!");
+  disp.setCursor(0,1);
+  disp.print("                    ");
+  disp.setCursor(0,2);
+  disp.print("    FINALIZADO!     ");
+  disp.setCursor(0,3);
+  disp.print("                    ");
 
   beep(2000);
   beep(2000);
