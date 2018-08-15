@@ -281,7 +281,7 @@ void doubleWash(){
   int soak = 300;
   disp.clear();
   disp.setCursor(0,0);
-  disp.print("ENXAGUE SIMPLES");
+  disp.print("ENXAGUE DUPLO");
   
   disp.setCursor(0,2);
   disp.print("Passo 1 de 6        ");
@@ -402,7 +402,7 @@ void simpleWash(){
   int soak = 300;
   disp.clear();
   disp.setCursor(0,0);
-  disp.print("ENXAGUE SIMPLES");
+  disp.print("UM ENXAGUE");
   
   disp.setCursor(0,2);
   disp.print("Passo 1 de 3        ");
@@ -574,7 +574,9 @@ int fillTankSoapV(){
     delay(1000);
     timeTankFull = timeTankFull + 1;
  
-    if (timeTankFull > 1380){
+    if (timeTankFull > 1440){
+      // 1440 s = 24 min
+      digitalWrite(soapValve, LOW);
       return -1;
     }
       
@@ -609,7 +611,9 @@ int fillTankSoftV(){
     delay(1000);
     timeTankFull = timeTankFull + 1;
     // To do: put a timer to not overfill the tank
-    if (timeTankFull > 1380){
+    if (timeTankFull > 1440){
+      // 1440 s = 24 min
+      digitalWrite(softenerValve, LOW);
       return -1;
     }
     
@@ -668,7 +672,7 @@ void normalWashing(){
   int soak = 300;
   disp.clear();
   disp.setCursor(0,0);
-  disp.print("LAVAGEM NORMAL      ");
+  disp.print("LAVAGEM COMPLETA    ");
   
   disp.setCursor(0,2);
   disp.print("Passo 1 de 9        ");
@@ -702,7 +706,7 @@ void normalWashing(){
       
       //===========================================
 
-   endBeep();
+
       
   }
 
@@ -775,9 +779,7 @@ void normalWashing(){
   disp.print("Passo 9 de 9        ");
   centrifuge();
 
-  disp.clear();
-  disp.setCursor(0,2);
-  disp.print("   FIM DO CICLO     ");  
+  endBeep();
 
 
   
