@@ -279,6 +279,8 @@ void doubleWash(){
   int spin = 450;
   int pause = 200;
   int soak = 300;
+  int flushTime = 120;
+  int centrifugationTime = 180;
   disp.clear();
   disp.setCursor(0,0);
   disp.print("ENXAGUE DUPLO");
@@ -297,7 +299,7 @@ void doubleWash(){
 
   // Wash time + centrifugue time (guessing that the tank takes
   // 120s to empty)
-  totalTime = totalTime + 2*(120   + 180) + timeTankFlood;
+  totalTime = totalTime + 2*(flushTime + centrifugationTime) + timeTankFlood;
 
   updateTime(totalTime);
   
@@ -313,7 +315,7 @@ void doubleWash(){
   disp.setCursor(0,2);
   disp.print("Passo 3 de 6        ");
   centrifuge();
-  totalTime = totalTime - 120  - 180;
+  totalTime = totalTime - flushTime - centrifugationTime;
   updateTime(totalTime);
 
   disp.setCursor(0,2);
