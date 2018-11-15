@@ -670,6 +670,8 @@ void normalWashing(){
   int spin = 400;
   int pause = 200;
   int soak = 300;
+  int flushTime = 120; // Additional time to flush the tank after pressure switch is comutted
+  int centrifugationTime = 180;
   disp.clear();
   disp.setCursor(0,0);
   disp.print("LAVAGEM COMPLETA    ");
@@ -685,7 +687,7 @@ void normalWashing(){
   // Wash time + centrifugue time (guessing that the tank takes
   // 60s to empty)
 
-  totalTime = totalTime + 3*(120   + 180);
+  totalTime = totalTime + 3*(flushTime + centrifugationTime);
 
   // Wash time + tankFill
   totalTime = totalTime + 2*timeTankFlood;
@@ -746,7 +748,7 @@ void normalWashing(){
   disp.print("Passo 6 de 9        ");
   centrifuge();
   // Update Time ==============================
-  totalTime = totalTime - (120   + 180);
+  totalTime = totalTime - (flushTime + centrifugationTime);
   updateTime(totalTime);
       
   //===========================================
@@ -791,6 +793,8 @@ void delicateWash(){
   int spin = 450;
   int pause = 1000;
   int soak = 300;
+  int flushTime = 120;
+  int centrifugationTime = 180;
   disp.clear();
   disp.setCursor(0,0);
   disp.print("LAVAGEM DELICADA");
@@ -807,7 +811,7 @@ void delicateWash(){
   // Wash time + centrifugue time (guessing that the tank takes
   // 120s to empty)
 
-  totalTime = totalTime + 3*(120   + 180);
+  totalTime = totalTime + 3*(flushTime + centrifugationTime);
 
   // Wash time + tankFill
   totalTime = totalTime + 2*timeTankFlood;
@@ -831,7 +835,7 @@ void delicateWash(){
   centrifuge();
 
   // Update Time ==============================
-  totalTime = totalTime - (120   + 180);
+  totalTime = totalTime - (flushTime + centrifugationTime);
   updateTime(totalTime);
   //===========================================
   disp.setCursor(0,2);
