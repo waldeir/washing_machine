@@ -547,7 +547,7 @@ void errorTank(){
   disp.setCursor(0,0);
   disp.print("       ERRO!");
   disp.setCursor(0,1);
-  disp.print("O tanque não enche");
+  disp.print("Tanque demorando para encher!");
 
   for (int i = 0;i<20;i++){
     beep(500);
