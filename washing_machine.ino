@@ -75,7 +75,7 @@ void menu(){
   disp.setCursor(0,1);
   disp.print("  FIRMWARE VERSION  ");
   disp.setCursor(0,2);
-  disp.print("        1.0         ");
+  disp.print("        1.1         ");
   delay(2000);
   disp.clear();
   disp.setCursor(0,0);
@@ -730,7 +730,7 @@ void normalWashing(){
   centrifuge();
 
   // Update Time ==============================
-  totalTime = totalTime - (120   + 180);
+  totalTime = totalTime - (flushTime + centrifugationTime);
   updateTime(totalTime);
       
   //===========================================
@@ -880,7 +880,7 @@ void delicateWash(){
   disp.print("Passo 6 de 9        ");
   centrifuge();
   // Update Time ==============================
-  totalTime = totalTime - (120   + 180);
+  totalTime = totalTime - (flushTime + centrifugationTime);
   updateTime(totalTime);
 
   disp.setCursor(0,2);
