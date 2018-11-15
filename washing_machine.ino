@@ -402,6 +402,8 @@ void simpleWash(){
   int spin = 450;
   int pause = 200;
   int soak = 300;
+  int flushTime = 120;
+  int centrifugueTime = 180;
   disp.clear();
   disp.setCursor(0,0);
   disp.print("UM ENXAGUE");
@@ -420,7 +422,7 @@ void simpleWash(){
 
   // Wash time + centrifugue time (guessing that the tank takes
   // 120s to empty)
-  totalTime = totalTime + 120   + 180;
+  totalTime = totalTime + flushTime + centrifugueTime;
 
   updateTime(totalTime);
   
