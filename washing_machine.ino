@@ -2,8 +2,8 @@
 
 
 const int pump = 10;    
-const int motorCW =  6;
-const int motorCCW = 9;
+const int motorCW =  6; // Motor clock wise
+const int motorCCW = 9; // Motor counter clock wise
 const int soapValve = 7;
 const int softenerValve = 8;
 const int pressostato = 5;
