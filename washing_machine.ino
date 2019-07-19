@@ -75,7 +75,7 @@ void menu(){
   disp.setCursor(0,1);
   disp.print("  FIRMWARE VERSION  ");
   disp.setCursor(0,2);
-  disp.print("        1.1         ");
+  disp.print("        1.2         ");
   delay(2000);
   disp.clear();
   disp.setCursor(0,0);
