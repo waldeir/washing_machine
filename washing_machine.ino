@@ -306,7 +306,7 @@ void doubleWash(){
   disp.setCursor(0,2);
   disp.print("Passo 2 de 6        ");
   for (int i=0;i<3;i++){
-      wash(hits, spin, pause, soak);
+      wash(hits, spin, pause, soak, i + 1);
 
       totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
       updateTime(totalTime);
@@ -334,7 +334,7 @@ void doubleWash(){
   disp.setCursor(0,2);
   disp.print("Passo 5 de 6        ");
   for (int i=0;i<3;i++){
-      wash(hits, spin, pause, soak);
+      wash(hits, spin, pause, soak, i + 1);
 
       totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
       updateTime(totalTime);
@@ -382,7 +382,7 @@ void justSoak(){
   disp.setCursor(0,2);
   disp.print("Passo 2 de 2        ");
   for (int i=0;i<3;i++){
-      wash(hits, spin, pause, soak);
+      wash(hits, spin, pause, soak, i + 1);
 
       totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
       updateTime(totalTime);
@@ -429,7 +429,7 @@ void simpleWash(){
   disp.setCursor(0,2);
   disp.print("Passo 2 de 3        ");
   for (int i=0;i<3;i++){
-      wash(hits, spin, pause, soak);
+      wash(hits, spin, pause, soak, i + 1);
 
       totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
       updateTime(totalTime);
@@ -643,7 +643,7 @@ int fillTankSoftV(){
 
   }
 
-void wash(int hits, int spin, int pause, int soak){
+void wash(int hits, int spin, int pause, int soak, int i){
   disp.setCursor(0,3);
   disp.print("ENXAGUE      (BATER)");
 
@@ -661,7 +661,9 @@ void wash(int hits, int spin, int pause, int soak){
     hits = hits - 1;
     }
   disp.setCursor(0,3);
-  disp.print("ENXAGUE      (MOLHO)");
+  disp.print("ENXAGUE    (MOLHO");
+  disp.print(i);
+  disp.print(")");
     for(int j=0;j<=soak;j++)
     {
       delay(1000);
@@ -705,7 +707,7 @@ void normalWashing(){
   disp.setCursor(0,2);
   disp.print("Passo 2 de 9        ");
   
-  wash(hits, spin, pause, 900);
+  wash(hits, spin, pause, 900, 1);
   totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + 900);
   updateTime(totalTime);
   
@@ -713,7 +715,7 @@ void normalWashing(){
 
   
   for (int i=0;i<2;i++){
-      wash(hits, spin, pause, soak);
+      wash(hits, spin, pause, soak, i + 2);
       
       // Update Time ==============================
       totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
@@ -750,7 +752,7 @@ void normalWashing(){
   disp.setCursor(0,2);
   disp.print("Passo 5 de 9        ");
   for (int i=0;i<3;i++){
-      wash(hits, spin, pause, soak);
+      wash(hits, spin, pause, soak, i + 1);
       
       // Update Time ==============================
       totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
@@ -782,7 +784,7 @@ void normalWashing(){
   disp.setCursor(0,2);
   disp.print("Passo 8 de 9        ");
   for (int i=0;i<3;i++){
-      wash(hits, spin, pause, soak);
+      wash(hits, spin, pause, soak, i + 1);
       // Update Time ==============================
       totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
       updateTime(totalTime);
@@ -838,12 +840,12 @@ void delicateWash(){
   disp.setCursor(0,2);
   disp.print("Passo 2 de 9        ");
   
-  wash(hits, spin, pause, 900);
+  wash(hits, spin, pause, 900,1);
   totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + 900);
   updateTime(totalTime);
     
   for (int i=0;i<2;i++){
-      wash(hits, spin, pause, soak);
+      wash(hits, spin, pause, soak, i + 2);
 
       totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
       updateTime(totalTime);
@@ -872,7 +874,7 @@ void delicateWash(){
   disp.setCursor(0,2);
   disp.print("Passo 5 de 9        ");
   for (int i=0;i<3;i++){
-      wash(hits, spin, pause, soak);
+      wash(hits, spin, pause, soak, i + 1);
       
       totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
       updateTime(totalTime);
@@ -898,7 +900,7 @@ void delicateWash(){
   disp.setCursor(0,2);
   disp.print("Passo 8 de 9        ");
   for (int i=0;i<3;i++){
-      wash(hits, spin, pause, soak);
+      wash(hits, spin, pause, soak, i + 1);
       
       totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
       updateTime(totalTime);
