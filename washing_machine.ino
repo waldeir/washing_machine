@@ -569,14 +569,17 @@ void errorTank(){
 
 int fillTankSoapV(){
   int timeTankFull = 0;
+  int tankIsFull = 0;
   // fill tank using the soap valve
-  // While the tank is not complete keep the valve open
   Serial.println("Inundando o tanque  ");
   disp.setCursor(0,3);
   disp.print("INUNDANDO O TANQUE  ");
-  
-  while ( digitalRead(pressostato) == 0){
-    digitalWrite(soapValve,HIGH);
+  digitalWrite(soapValve,HIGH);
+
+  while ( tankIsFull < 3){
+    if(digitalRead(pressostato) == 1)
+        tankIsFull++;
+    }
     delay(1000);
     timeTankFull = timeTankFull + 1;
  
