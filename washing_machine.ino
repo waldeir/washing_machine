@@ -522,7 +522,7 @@ void justCentrifugue(){
 void centrifuge(){
   Serial.println("Esvaziando o tanque");
   disp.setCursor(0,3);
-  disp.print("CENTRIFUGAR  (BOMBA)");
+  disp.print("ESVAZIANDO O TANQUE ");
 
   digitalWrite(pump,HIGH); 
   while(digitalRead(pressostato) == 1){
@@ -532,7 +532,7 @@ void centrifuge(){
   delay(1000);
   }
   disp.setCursor(0,3);
-  disp.print("CENTRIFUGAR   (GIRO)");
+  disp.print("   CENTRIFUGANDO    ");
   Serial.println("Centrifugando");
 
 
