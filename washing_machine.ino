@@ -645,7 +645,8 @@ int fillTankSoftV(){
 
 void wash(int hits, int spin, int pause, int soak, int i){
   disp.setCursor(0,3);
-  disp.print("ENXAGUE      (BATER)");
+  disp.print("ENXAGUE:      BATER");
+  disp.print(i);
 
   Serial.println("Batendo");
   while (hits > 0){
@@ -661,9 +662,8 @@ void wash(int hits, int spin, int pause, int soak, int i){
     hits = hits - 1;
     }
   disp.setCursor(0,3);
-  disp.print("ENXAGUE    (MOLHO");
+  disp.print("ENXAGUE:      MOLHO");
   disp.print(i);
-  disp.print(")");
     for(int j=0;j<=soak;j++)
     {
       delay(1000);
