@@ -592,17 +592,20 @@ int fillTankSoapV(){
 
 int fillTankSoftV(){
     int timeTankFull = 0;
+    int tankIsFull = 0;
     // fill tank using the softener valve
-    // While the tank is not complete keep the valve open
     Serial.println("Abrindo válvula de amaciante");
     disp.setCursor(0,3);
     disp.print("COLOCANDO AMACIANTE ");
-    timeTankFull = 0;
+    digitalWrite(softenerValve,HIGH);
 
-    while ( digitalRead(pressostato) == 0 ){
-        digitalWrite(softenerValve,HIGH);
+    while ( tankIsFull < 3 ){
+        if(digitalRead(pressostato) == 1){
+            tankIsFull++;
+        }
         delay(1000);
         timeTankFull = timeTankFull + 1;
+
         if (timeTankFull > 1440){
             // 1440 s = 24 min
             digitalWrite(softenerValve, LOW);
