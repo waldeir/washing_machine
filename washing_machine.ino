@@ -577,7 +577,7 @@ int fillTankSoapV(){
   digitalWrite(soapValve,HIGH);
 
   while ( tankIsFull < 3){
-    if(digitalRead(pressostato) == 1)
+    if(digitalRead(pressostato) == 1){
         tankIsFull++;
     }
     delay(1000);
@@ -648,7 +648,7 @@ int fillTankSoftV(){
 
 void wash(int hits, int spin, int pause, int soak, int i){
   disp.setCursor(0,3);
-  disp.print("ENXAGUE:      BATER");
+  disp.print("ENXAGUE:     BATER ");
   disp.print(i);
 
   Serial.println("Batendo");
@@ -665,7 +665,7 @@ void wash(int hits, int spin, int pause, int soak, int i){
     hits = hits - 1;
     }
   disp.setCursor(0,3);
-  disp.print("ENXAGUE:      MOLHO");
+  disp.print("ENXAGUE:     MOLHO ");
   disp.print(i);
     for(int j=0;j<=soak;j++)
     {
