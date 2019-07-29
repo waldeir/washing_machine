@@ -173,7 +173,7 @@ void menu(){
               printMenuItem(meIndex);
               delay(2000);
               programa = meIndex;
-              Serial.print("Programa=");
+              Serial.print("Program=");
               Serial.println(programa);
               break;
           }
@@ -498,7 +498,7 @@ void printMenuItem(int menuIndex){
 }
  
 void centrifuge(){
-    Serial.println("Esvaziando o tanque");
+    Serial.println("Flushing the tank");
     disp.setCursor(0,3);
     disp.print("ESVAZIANDO O TANQUE ");
   
@@ -514,7 +514,7 @@ void centrifuge(){
 
     disp.setCursor(0,3);
     disp.print("   CENTRIFUGANDO    ");
-    Serial.println("Centrifugando");
+    Serial.println("Centrifugation");
     
     digitalWrite(motorCCW,HIGH);
 
@@ -523,7 +523,7 @@ void centrifuge(){
     }
 
     digitalWrite(motorCCW,LOW);
-    Serial.println("Fim da Centrifugação");
+    Serial.println("End of centrifugation");
     digitalWrite(pump,LOW);
 }
 
@@ -553,7 +553,7 @@ int fillTankSoapV(){
     int timeTankFull = 0;
     int tankIsFull = 0;
     // fill tank using the soap valve
-    Serial.println("Inundando o tanque  ");
+    Serial.println("Flooding the tank");
     disp.setCursor(0,3);
     disp.print("INUNDANDO O TANQUE  ");
     digitalWrite(soapValve,HIGH);
@@ -574,7 +574,7 @@ int fillTankSoapV(){
     }
 
     digitalWrite(soapValve,LOW);
-    Serial.println("Fechando válvula de sabão");
+    Serial.println("Closing soap valve");
     Serial.print("Tempo = ");
     disp.setCursor(0,3);
     disp.print("                    ");
@@ -594,7 +594,7 @@ int fillTankSoftV(){
     int timeTankFull = 0;
     int tankIsFull = 0;
     // fill tank using the softener valve
-    Serial.println("Abrindo válvula de amaciante");
+    Serial.println("Opening softener valve");
     disp.setCursor(0,3);
     disp.print("COLOCANDO AMACIANTE ");
     digitalWrite(softenerValve,HIGH);
@@ -625,7 +625,7 @@ int fillTankSoftV(){
     disp.print("min");
     delay(1000);
     
-    Serial.println("Fechando válvula de amaciante");
+    Serial.println("Closing softener valve");
     Serial.print("Tempo = ");
     Serial.println(timeTankFull);
     timeTankFull++;
@@ -637,7 +637,7 @@ void wash(int hits, int spin, int pause, int soak, int i){
     disp.setCursor(0,3);
     disp.print("ENXAGUE:     BATER ");
     disp.print(i); 
-    Serial.println("Batendo");
+    Serial.println("Washing");
 
     while (hits > 0){
         digitalWrite(motorCW,HIGH);
