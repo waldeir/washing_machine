@@ -532,6 +532,7 @@ void errorTank(){
     disp.clear();
     disp.setCursor(0,0);
     disp.print("       ERRO!");
+    Serial.println("Error: Tank is tanking too long to fill!");
     disp.setCursor(0,1);
     disp.print("Tanque demorando");
     disp.setCursor(0,2);
@@ -569,8 +570,14 @@ int fillTankSoapV(){
                 tankIsFull = 0;
             }
         }
+        Serial.print("tankIsFull = ");
+        Serial.println(tankIsFull);
+
         delay(1000);
         timeTankFull = timeTankFull + 1;
+        Serial.print("timeTankFull");
+        Serial.println(timeTankFull);
+
    
         if (timeTankFull > 1440){
             // 1440 s = 24 min
@@ -692,7 +699,11 @@ void normalWashing(){
     disp.setCursor(0,2);
     disp.print("Passo 1 de 9        ");
     timeTankFlood = fillTankSoapV();
-  
+
+    if (timeTankFlood == -1){
+        errorTank();
+    }
+
     // Estimating cicle time:========================
     // Wash time
     totalTime = ((float)2*hits*(spin + pause)/(float)1000 + 900); // The first soak step has longer duration
@@ -746,7 +757,12 @@ void normalWashing(){
     
     disp.setCursor(0,2);
     disp.print("Passo 4 de 9        ");
-    fillTankSoapV();
+    timeTankFlood = fillTankSoapV();
+
+    if (timeTankFlood == -1){
+        errorTank();
+    }
+  
     
     // Update Time ==============================
     totalTime = totalTime - timeTankFlood;
@@ -777,7 +793,12 @@ void normalWashing(){
   
     disp.setCursor(0,2);
     disp.print("Passo 7 de 9        ");
-    fillTankSoftV();
+    timeTankFlood = fillTankSoftV();
+
+    if (timeTankFlood == -1){
+        errorTank();
+    }
+
       
     // Update Time ==============================
     totalTime = totalTime - timeTankFlood;
@@ -827,7 +848,11 @@ void delicateWash()
     disp.setCursor(0,2);
     disp.print("Passo 1 de 9        ");
     timeTankFlood = fillTankSoapV();
-  
+
+    if (timeTankFlood == -1){
+        errorTank();
+    }
+ 
     // Estimating cicle time:========================
     // Wash time
     totalTime = ((float)2*hits*(spin + pause)/(float)1000 + 900); // The first soak step has longer duration
@@ -869,7 +894,12 @@ void delicateWash()
     //===========================================
     disp.setCursor(0,2);
     disp.print("Passo 4 de 9        ");
-    fillTankSoapV();
+    timeTankFlood = fillTankSoapV();
+
+    if (timeTankFlood == -1){
+        errorTank();
+    }
+
     
     // Update Time ==============================
     totalTime = totalTime - timeTankFlood;
@@ -895,7 +925,12 @@ void delicateWash()
   
     disp.setCursor(0,2);
     disp.print("Passo 7 de 9        ");
-    fillTankSoftV();
+    timeTankFlood = fillTankSoftV();
+
+    if (timeTankFlood == -1){
+        errorTank();
+    }
+
     
     // Update Time ==============================
     totalTime = totalTime - timeTankFlood;
