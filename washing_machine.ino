@@ -558,7 +558,7 @@ int fillTankSoapV(){
     disp.print("INUNDANDO O TANQUE  ");
     digitalWrite(soapValve,HIGH);
   
-   // Presssostate must close longer than 3 seconds
+    // Presssostate must close longer than 3 seconds
     while ( tankIsFull < 3){
         if(digitalRead(pressostato) == 1){
             tankIsFull++;
@@ -610,6 +610,13 @@ int fillTankSoftV(){
         if(digitalRead(pressostato) == 1){
             tankIsFull++;
         }
+        else{
+            tankIsFull--;
+            if( tankIsFull < 0 ){
+                tankIsFull = 0;
+            }
+        }
+
         delay(1000);
         timeTankFull = timeTankFull + 1;
 
@@ -803,7 +810,8 @@ void normalWashing(){
     
 }
 
-void delicateWash(){
+void delicateWash()
+{
     int hits = 60;
     int spin = 450;
     int pause = 1000;
