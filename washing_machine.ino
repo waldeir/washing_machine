@@ -74,7 +74,7 @@ void menu(){
     disp.setCursor(0,1);
     disp.print("  FIRMWARE VERSION  ");
     disp.setCursor(0,2);
-    disp.print("        1.2         ");
+    disp.print("        1.3 BETA    ");
     delay(2000);
     disp.clear();
     disp.setCursor(0,0);
@@ -527,8 +527,9 @@ void centrifuge(){
     digitalWrite(pump,LOW);
 }
 
-
 void errorTank(){
+    digitalWrite(soapValve,LOW);
+    digitalWrite(softenerValve,LOW);
     disp.clear();
     disp.setCursor(0,0);
     disp.print("       ERRO!");
@@ -551,106 +552,79 @@ void errorTank(){
 
 
 int fillTankSoapV(){
-    int timeTankFull = 0;
-    int tankIsFull = 0;
+    unsigned long timeTankFull = 0;
+    unsigned long timeStartFlood = millis();
     // fill tank using the soap valve
     Serial.println("Flooding the tank");
     disp.setCursor(0,3);
     disp.print("INUNDANDO O TANQUE  ");
     digitalWrite(soapValve,HIGH);
   
-    // Presssostate must close longer than 3 seconds
-    while ( tankIsFull < 3){
+
+    while(millis() - timeStartFlood < 1440000){
         if(digitalRead(pressostato) == 1){
-            tankIsFull++;
-        }
-        else{
-            tankIsFull--;
-            if( tankIsFull < 0 ){
-                tankIsFull = 0;
-            }
-        }
-        Serial.print("tankIsFull = ");
-        Serial.println(tankIsFull);
+            timeTankFull = millis() - timeStartFlood;
+            break;
+	}
 
-        delay(1000);
-        timeTankFull = timeTankFull + 1;
-        Serial.print("timeTankFull");
-        Serial.println(timeTankFull);
-
-   
-        if (timeTankFull > 1440){
-            // 1440 s = 24 min
-            digitalWrite(soapValve, LOW);
-            return -1;
-        }
-        
+    }
+	    if (millis() - timeStartFlood >= 1440000){
+        return -1;
     }
 
     digitalWrite(soapValve,LOW);
     Serial.println("Closing soap valve");
     Serial.print("Tempo = ");
+    int timeTankFullInInt = (float)1*timeTankFull/(float)1000;
+    Serial.println(timeTankFullInInt);
     disp.setCursor(0,3);
     disp.print("                    ");
     disp.setCursor(0,3);
     disp.print("TANQUE CHEIO ");
-    int dispTank = (float)1*timeTankFull/(float)60;
+    int dispTank = (float)1*timeTankFull/(float)60000;
     disp.print(dispTank);
     disp.print("min");
     delay(5000);
-    timeTankFull++;
-    Serial.println(timeTankFull);
-    return timeTankFull;
+    return timeTankFullInInt;
   
 }
 
 int fillTankSoftV(){
-    int timeTankFull = 0;
-    int tankIsFull = 0;
+    unsigned long timeTankFull = 0;
+    unsigned long timeStartFlood = millis();
     // fill tank using the softener valve
     Serial.println("Opening softener valve");
     disp.setCursor(0,3);
     disp.print("COLOCANDO AMACIANTE ");
     digitalWrite(softenerValve,HIGH);
 
-    while ( tankIsFull < 3 ){
+    while(millis() - timeStartFlood < 1440000){
         if(digitalRead(pressostato) == 1){
-            tankIsFull++;
+            timeTankFull = millis() - timeStartFlood;
+            break;
         }
-        else{
-            tankIsFull--;
-            if( tankIsFull < 0 ){
-                tankIsFull = 0;
-            }
-        }
-
-        delay(1000);
-        timeTankFull = timeTankFull + 1;
-
-        if (timeTankFull > 1440){
-            // 1440 s = 24 min
-            digitalWrite(softenerValve, LOW);
+        if(millis() - timeStartFlood >= 1440000){
             return -1;
         }
-      
     }
-
-    digitalWrite(softenerValve,LOW);
   
+    
+    digitalWrite(softenerValve,LOW);
+    Serial.println("Closing soap valve");
+    Serial.print("Tempo = ");
+    int timeTankFullInInt = (float)1*timeTankFull/(float)1000;
+    Serial.println(timeTankFullInInt);  
     disp.setCursor(0,3);
     disp.print("                    ");
     disp.setCursor(0,3);
     disp.print("TANQUE CHEIO ");
-    int dispTank = (float)1*timeTankFull/(float)60;
+    int dispTank = (float)1*timeTankFull/(float)60000;
     disp.print(dispTank);
     disp.print("min");
     delay(1000);
     
-    Serial.println("Closing softener valve");
-    Serial.print("Tempo = ");
-    Serial.println(timeTankFull);
-    timeTankFull++;
-    return timeTankFull;
+    timeTankFullInInt++;
+    return timeTankFullInInt;
   
 }
 
