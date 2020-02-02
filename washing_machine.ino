@@ -563,12 +563,23 @@ int fillTankSoapV(){
 
     while(millis() - timeStartFlood < 1440000){
         if(digitalRead(pressostato) == 1){
-            timeTankFull = millis() - timeStartFlood;
-            break;
+            delay(1500);
+            Serial.println("Is the tank really full?");
+
+            if(digitalRead(pressostato) == 1){
+                timeTankFull = millis() - timeStartFlood;
+                Serial.println("Yes, the tank is full.");
+                break;
+            }
+            else{
+                Serial.println("No, it is not.");
+                continue;
+            }
 	}
+        //Serial.println(millis() - timeStartFlood);
 
     }
-	    if (millis() - timeStartFlood >= 1440000){
+    if (millis() - timeStartFlood >= 1440000){
         return -1;
     }
 
@@ -584,6 +595,9 @@ int fillTankSoapV(){
     int dispTank = (float)1*timeTankFull/(float)60000;
     disp.print(dispTank);
     disp.print("min");
+    Serial.print("Tempo in Min: ");
+    Serial.println(dispTank);
+
     delay(5000);
     return timeTankFullInInt;
   
@@ -600,13 +614,23 @@ int fillTankSoftV(){
 
     while(millis() - timeStartFlood < 1440000){
         if(digitalRead(pressostato) == 1){
-            timeTankFull = millis() - timeStartFlood;
-            break;
-        }
-        if(millis() - timeStartFlood >= 1440000){
-            return -1;
-        }
+            delay(1000);
+
+            if(digitalRead(pressostato) == 1){
+                timeTankFull = millis() - timeStartFlood;
+                break;
+            }
+            else{
+                continue;
+            }
+	}
+        //Serial.println(millis() - timeStartFlood);
+
     }
+    if (millis() - timeStartFlood >= 1440000){
+        return -1;
+    }
+
   
     
     digitalWrite(softenerValve,LOW);
