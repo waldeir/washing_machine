@@ -571,9 +571,9 @@ int fillTankSoapV(){
     // A double verification using the if's ensure the the value
     // was not misread and let the valve open during at least 12 min, which is
     // suficient to elevate the wather level above the lowest pallets.
-    if(pressostato==1){
+    if(pressostato == 0){
         delay(1000);
-        if(digitalRead(pressostato) == 1){
+        if(digitalRead(pressostato) == 0){
         while (millis() - timeStartFlood < 720000){
         delay(1000);// This while loop waits for 12 min
         }
@@ -645,9 +645,9 @@ int fillTankSoftV(){
     // A double verification using the if's ensure the the value
     // was not misread and let the valve open during at least 12 min, which is
     // suficient to elevate the wather level above the lowest pallets.
-    if(pressostato==1){
+    if(pressostato == 0){
         delay(1000);
-        if(digitalRead(pressostato) == 1){
+        if(digitalRead(pressostato) == 0){
         while (millis() - timeStartFlood < 720000){
         delay(1000);// This while loop waits for 12 min
         }
@@ -721,8 +721,9 @@ void wash(int hits, int spin, int pause, int soak, int i){
     }
 
     disp.setCursor(0,3);
-    disp.print("ENXAGUE:     MOLHO ");
+    disp.print("ENXAGUE:   MOLHO ");
     disp.print(i);
+    disp.print("/3");
 
     for(int j=0;j<=soak;j++){
         delay(1000);
