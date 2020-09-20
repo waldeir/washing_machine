@@ -48,7 +48,7 @@ void setup() {
     pinMode(motorCCW, OUTPUT);
     pinMode(soapValve, OUTPUT);
     pinMode(softenerValve, OUTPUT);
-    pinMode(pressostato, INPUT);
+    pinMode(pressostato, INPUT); // Sensor: If HIGH the tank is full
     pinMode(Button1, INPUT);
     pinMode(Button3, INPUT);
     pinMode(Button2, INPUT);
@@ -74,7 +74,7 @@ void menu(){
     disp.setCursor(0,1);
     disp.print("  FIRMWARE VERSION  ");
     disp.setCursor(0,2);
-    disp.print("        1.3 BETA    ");
+    disp.print("        1.4 BETA    ");
     delay(2000);
     disp.clear();
     disp.setCursor(0,0);
@@ -559,8 +559,30 @@ int fillTankSoapV(){
     disp.setCursor(0,3);
     disp.print("INUNDANDO O TANQUE  ");
     digitalWrite(soapValve,HIGH);
-  
 
+    // Verify if the tank have some water and let the valve open for 
+    // 12 min. This procedure is necessary, because sometimes the 
+    // machine started to shake the tank with no water in it, despite
+    // the fact that the pressostato was not HIGH. A debug procedure showed
+    // that the arduino is randomly ignoring the while loop
+    // responsable for monitoring the pressostato state and proceeding to
+    // shaking the tank. I could not determine the cause of such behavior.
+
+    // A double verification using the if's ensure the the value
+    // was not misread and let the valve open during at least 12 min, which is
+    // suficient to elevate the wather level above the lowest pallets.
+    if(pressostato==1){
+        delay(1000);
+        if(digitalRead(pressostato) == 1){
+        while (millis() - timeStartFlood < 720000){
+        delay(1000);// This while loop waits for 12 min
+        }
+        }
+    }
+
+    
+
+    // This while loop monitors the pressostato state
     while(millis() - timeStartFlood < 1440000){
         if(digitalRead(pressostato) == 1){
             delay(1500);
@@ -612,12 +634,39 @@ int fillTankSoftV(){
     disp.print("COLOCANDO AMACIANTE ");
     digitalWrite(softenerValve,HIGH);
 
+    // Verify if the tank have some water and let the valve open for 
+    // 12 min. This procedure is necessary, because sometimes the 
+    // machine started to shake the tank with no water in it, despite
+    // the fact that the pressostato was not HIGH. A debug procedure showed
+    // that the arduino is randomly ignoring the while loop
+    // responsable for monitoring the pressostato state and proceeding to
+    // shaking the tank. I could not determine the cause of such behavior.
+
+    // A double verification using the if's ensure the the value
+    // was not misread and let the valve open during at least 12 min, which is
+    // suficient to elevate the wather level above the lowest pallets.
+    if(pressostato==1){
+        delay(1000);
+        if(digitalRead(pressostato) == 1){
+        while (millis() - timeStartFlood < 720000){
+        delay(1000);// This while loop waits for 12 min
+        }
+        }
+    }
+
+    
+
+    // This while loop monitors the pressostato state
     while(millis() - timeStartFlood < 1440000){
+        // Two if's to double check if the pressostato is in short and,
+        // ensure the the tank is full.
         if(digitalRead(pressostato) == 1){
             delay(1000);
+            Serial.println("Is the tank really full?");
 
             if(digitalRead(pressostato) == 1){
                 timeTankFull = millis() - timeStartFlood;
+                Serial.println("Yes, the tank is full");
                 break;
             }
             else{
