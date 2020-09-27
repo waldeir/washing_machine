@@ -273,7 +273,7 @@ void doubleWash(){
     
     disp.setCursor(0,2);
     disp.print(F("Passo 1 de 6        "));
-    timeTankFlood = fillTankSoapV();
+    timeTankFlood = fillTank(1);
   
     if (timeTankFlood == -1){
         errorTank();
@@ -307,7 +307,7 @@ void doubleWash(){
     disp.setCursor(0,2);
     disp.print(F("Passo 4 de 6        "));
     
-    timeTankFlood = fillTankSoftV();
+    timeTankFlood = fillTank(2);
     
     if (timeTankFlood == -1){
         errorTank();
@@ -353,7 +353,7 @@ void justSoak(){
     
     disp.setCursor(0,2);
     disp.print(F("Passo 1 de 2        "));
-    timeTankFlood = fillTankSoapV();
+    timeTankFlood = fillTank(1);
   
     if (timeTankFlood == -1){
         errorTank();
@@ -393,7 +393,7 @@ void simpleWash(){
     
     disp.setCursor(0,2);
     disp.print(F("Passo 1 de 3        "));
-    timeTankFlood = fillTankSoapV();
+    timeTankFlood = fillTank(1);
   
     if (timeTankFlood == -1){
         errorTank();
@@ -578,15 +578,26 @@ void errorTank(){
 
 
 
-int fillTankSoapV(){
+int fillTank(int whatValve){
+    // Fill the tank with water. If whatValve is 1, it uses the soap valve, if
+    // not 1, it uses the softener valve
     const int maxTimeToWait = 1800000;
     unsigned long timeTankFull = 0;
     unsigned long timeStartFlood = millis();
-    // fill tank using the soap valve
-    Serial.println(F("Flooding the tank"));
-    disp.setCursor(0,3);
-    disp.print(F("INUNDANDO O TANQUE  "));
-    digitalWrite(soapValve,HIGH);
+    if( whatValve == 1){
+        // fill tank using the soap valve
+        disp.setCursor(0,3);
+        Serial.println(F("Flooding the tank"));
+        disp.print(F("INUNDANDO O TANQUE  "));
+        digitalWrite(soapValve,HIGH);
+    }
+    else {
+        // fill tank using the softener valve
+        Serial.println(F("Opening softener valve"));
+        disp.setCursor(0,3);
+        disp.print(F("COLOCANDO AMACIANTE "));
+        digitalWrite(softenerValve,HIGH);
+    }
 
     /* Uncomment this in case of misdetection of tank level occur.
 
@@ -636,8 +647,15 @@ int fillTankSoapV(){
         return -1;
     }
 
-    digitalWrite(soapValve,LOW);
-    Serial.println(F("Closing soap valve"));
+    if ( whatValve == 1) {
+        digitalWrite(soapValve,LOW);
+        Serial.println(F("Closing soap valve"));
+    }
+    else{
+        digitalWrite(softenerValve,LOW);
+        Serial.println(F("Closing softener valve"));
+    }
+
     Serial.print(F("Tempo = "));
     int timeTankFullInInt = (float)1*timeTankFull/(float)1000;
     Serial.println(timeTankFullInInt);
@@ -656,87 +674,6 @@ int fillTankSoapV(){
   
 }
 
-int fillTankSoftV(){
-    const int maxTimeToWait = 1800000;
-    unsigned long timeTankFull = 0;
-    unsigned long timeStartFlood = millis();
-    // fill tank using the softener valve
-    Serial.println(F("Opening softener valve"));
-    disp.setCursor(0,3);
-    disp.print(F("COLOCANDO AMACIANTE "));
-    digitalWrite(softenerValve,HIGH);
-
-    /* Uncomment this in case of misdetection of tank level occur.
-
-    // Verify if the tank have some water and let the valve open for 
-    // 12 min. This procedure is necessary, because sometimes the 
-    // machine started to shake the tank with no water in it, despite
-    // the fact that the pressostato was not HIGH. A debug procedure showed
-    // that the arduino is randomly ignoring the while loop
-    // responsable for monitoring the pressostato state and proceeding to
-    // shaking the tank. I could not determine the cause of such behavior.
-
-    // A double verification using the if's ensure the the value
-    // was not misread and let the valve open during at least 12 min, which is
-    // suficient to elevate the wather level above the lowest pallets.
-    if(digitalRead(pressostato) == 0){
-        delay(1000);
-        Serial.println(F("Is the tank really full?"));
-
-        if(digitalRead(pressostato) == 0){
-        while (millis() - timeStartFlood < 540000){
-        delay(1000);// This while loop waits for 9 min
-        }
-        }
-    }
-    */
-
-    
-
-    // This while loop monitors the pressostato state
-    while(millis() - timeStartFlood < maxTimeToWait){
-        // Two if's to double check if the pressostato is in short and,
-        // ensure the the tank is full.
-        if(digitalRead(pressostato) == 1){
-            delay(1000);
-            Serial.println(F("Is the tank really full?"));
-
-            if(digitalRead(pressostato) == 1){
-                timeTankFull = millis() - timeStartFlood;
-                Serial.println(F("Yes, the tank is full"));
-                break;
-            }
-            else{
-                continue;
-            }
-	}
-        //Serial.println(millis() - timeStartFlood);
-
-    }
-    if (millis() - timeStartFlood >= maxTimeToWait){
-        return -1;
-    }
-
-  
-    
-    digitalWrite(softenerValve,LOW);
-    Serial.println(F("Closing soap valve"));
-    Serial.print(F("Tempo = "));
-    int timeTankFullInInt = (float)1*timeTankFull/(float)1000;
-    Serial.println(timeTankFullInInt);  
-    disp.setCursor(0,3);
-    disp.print(F("                    "));
-    disp.setCursor(0,3);
-    disp.print(F("TANQUE CHEIO "));
-    int dispTank = (float)1*timeTankFull/(float)60000;
-    disp.print(dispTank);
-    disp.print(F("min"));
-    delay(1000);
-    
-    timeTankFullInInt++;
-    return timeTankFullInInt;
-  
-}
 
 void wash(int hits, int spin, int pause, int soak, int i){
     disp.setCursor(0,3);
@@ -790,7 +727,7 @@ void normalWashing(){
     
     disp.setCursor(0,2);
     disp.print(F("Passo 1 de 9        "));
-    timeTankFlood = fillTankSoapV();
+    timeTankFlood = fillTank(1);
 
     if (timeTankFlood == -1){
         errorTank();
@@ -849,7 +786,7 @@ void normalWashing(){
     
     disp.setCursor(0,2);
     disp.print(F("Passo 4 de 9        "));
-    timeTankFlood = fillTankSoapV();
+    timeTankFlood = fillTank(1);
 
     if (timeTankFlood == -1){
         errorTank();
@@ -885,7 +822,7 @@ void normalWashing(){
   
     disp.setCursor(0,2);
     disp.print(F("Passo 7 de 9        "));
-    timeTankFlood = fillTankSoftV();
+    timeTankFlood = fillTank(2);
 
     if (timeTankFlood == -1){
         errorTank();
@@ -939,7 +876,7 @@ void delicateWash()
     
     disp.setCursor(0,2);
     disp.print(F("Passo 1 de 9        "));
-    timeTankFlood = fillTankSoapV();
+    timeTankFlood = fillTank(1);
 
     if (timeTankFlood == -1){
         errorTank();
@@ -986,7 +923,7 @@ void delicateWash()
     //===========================================
     disp.setCursor(0,2);
     disp.print(F("Passo 4 de 9        "));
-    timeTankFlood = fillTankSoapV();
+    timeTankFlood = fillTank(1);
 
     if (timeTankFlood == -1){
         errorTank();
@@ -1017,7 +954,7 @@ void delicateWash()
   
     disp.setCursor(0,2);
     disp.print(F("Passo 7 de 9        "));
-    timeTankFlood = fillTankSoftV();
+    timeTankFlood = fillTank(2);
 
     if (timeTankFlood == -1){
         errorTank();
