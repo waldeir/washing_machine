@@ -562,6 +562,8 @@ int fillTankSoapV(){
     disp.print(F("INUNDANDO O TANQUE  "));
     digitalWrite(soapValve,HIGH);
 
+    /* Uncomment this in case of misdetection of tank level occur.
+
     // Verify if the tank have some water and let the valve open for 
     // 12 min. This procedure is necessary, because sometimes the 
     // machine started to shake the tank with no water in it, despite
@@ -582,6 +584,7 @@ int fillTankSoapV(){
         }
         }
     }
+    */
     
 
     // This while loop monitors the pressostato state
@@ -636,6 +639,8 @@ int fillTankSoftV(){
     disp.print(F("COLOCANDO AMACIANTE "));
     digitalWrite(softenerValve,HIGH);
 
+    /* Uncomment this in case of misdetection of tank level occur.
+
     // Verify if the tank have some water and let the valve open for 
     // 12 min. This procedure is necessary, because sometimes the 
     // machine started to shake the tank with no water in it, despite
@@ -657,6 +662,7 @@ int fillTankSoftV(){
         }
         }
     }
+    */
 
     
 
