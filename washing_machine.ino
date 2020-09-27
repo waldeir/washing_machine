@@ -1,4 +1,5 @@
 #include <LiquidCrystal.h>                             // Lib for the lcd display
+#include <TimerOne.h>
 
 
 const int pump = 10;    
@@ -261,10 +262,10 @@ void endBeep(){
 void doubleWash(){
   
     int totalTime;
-    int hits = 60;
-    int spin = 450;
-    int pause = 200;
-    int soak = 300;
+    int hitsNumber = 60;
+    int spinTime = 450;
+    int pauseTime = 200;
+    int soakTime = 300;
     int flushTime = 120;
     int centrifugationTime = 180;
     disp.clear();
@@ -281,7 +282,7 @@ void doubleWash(){
   
     // Estimating cicle time:
     // Wash time
-    totalTime = 6*((float)2*hits*(spin + pause)/(float)1000 + soak);
+    totalTime = 6*((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
   
     // Wash time + centrifugue time (guessing that the tank takes
     // 120s to empty)
@@ -292,9 +293,9 @@ void doubleWash(){
     disp.setCursor(0,2);
     disp.print(F("Passo 2 de 6        "));
     for (int i=0;i<3;i++){
-        wash(hits, spin, pause, soak, i + 1);
+        wash(hitsNumber, spinTime, pauseTime, soakTime, i + 1,3);
   
-        totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
+        totalTime = totalTime - ((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
         updateTime(totalTime);
     }
   
@@ -320,9 +321,9 @@ void doubleWash(){
     disp.setCursor(0,2);
     disp.print(F("Passo 5 de 6        "));
     for (int i=0;i<3;i++){
-        wash(hits, spin, pause, soak, i + 1);
+        wash(hitsNumber, spinTime, pauseTime, soakTime, i + 1,3);
   
-        totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
+        totalTime = totalTime - ((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
         updateTime(totalTime);
     }
   
@@ -343,10 +344,10 @@ void doubleWash(){
 void justSoak(){
 
     int totalTime;
-    int hits = 60;
-    int spin = 450;
-    int pause = 200;
-    int soak = 300;
+    int hitsNumber = 60;
+    int spinTime = 450;
+    int pauseTime = 200;
+    int soakTime = 300;
     disp.clear();
     disp.setCursor(0,0);
     disp.print(F("DEIXAR DE MOLHO     "));
@@ -361,7 +362,7 @@ void justSoak(){
   
     // Estimating cicle time:
     // Wash time
-    totalTime = 3*((float)2*hits*(spin + pause)/(float)1000 + soak);
+    totalTime = 3*((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
   
     updateTime(totalTime);
     
@@ -369,8 +370,8 @@ void justSoak(){
     disp.print(F("Passo 2 de 2        "));
 
     for (int i=0;i<3;i++){
-        wash(hits, spin, pause, soak, i + 1);
-        totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
+        wash(hitsNumber, spinTime, pauseTime, soakTime, i + 1,3);
+        totalTime = totalTime - ((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
         updateTime(totalTime);
     }
   
@@ -381,10 +382,10 @@ void justSoak(){
 void simpleWash(){
 
     int totalTime;
-    int hits = 60;
-    int spin = 450;
-    int pause = 200;
-    int soak = 300;
+    int hitsNumber = 60;
+    int spinTime = 450;
+    int pauseTime = 200;
+    int soakTime = 300;
     int flushTime = 120;
     int centrifugueTime = 180;
     disp.clear();
@@ -401,7 +402,7 @@ void simpleWash(){
   
     // Estimating cicle time:
     // Wash time
-    totalTime = 3*((float)2*hits*(spin + pause)/(float)1000 + soak);
+    totalTime = 3*((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
   
     // Wash time + centrifugue time (guessing that the tank takes
     // 120s to empty)
@@ -413,9 +414,9 @@ void simpleWash(){
     disp.print(F("Passo 2 de 3        "));
 
     for (int i=0;i<3;i++){
-        wash(hits, spin, pause, soak, i + 1);
+        wash(hitsNumber, spinTime, pauseTime, soakTime, i + 1,3);
   
-        totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
+        totalTime = totalTime - ((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
         updateTime(totalTime);
     }
   
@@ -675,38 +676,50 @@ int fillTank(int whatValve){
 }
 
 
-void wash(int hits, int spin, int pause, int soak, int i){
+void wash(int hitsNumber, int spinTime, int pauseTime, int soakTime, int currentStep, int totalSteps){
+    // spinTime and pauseTime determine the behavior of the blades and are in
+    // milliseconds
+
+    // soakTime is in seconds
+    
+    // totalSteps can not have more than one digit, because that would overflow
+    // the LCD display
+
     disp.setCursor(0,3);
     disp.print(F("ENXAGUE:   BATER "));
-    disp.print(i); 
-    disp.print(F("/3"));
+    disp.print(currentStep); 
+    disp.print(F("/"));
+    disp.print(totalSteps);
     Serial.print(F("Shaking "));
-    Serial.print(i);
-    Serial.println(F(" of 3"));
+    Serial.print(currentStep);
+    Serial.print(F(" of "));
+    Serial.println(totalSteps);
     
 
-    while (hits > 0){
+    while (hitsNumber > 0){
         digitalWrite(motorCW,HIGH);
-        delay(spin);
+        delay(spinTime);
         digitalWrite(motorCW,LOW);
-        delay(pause);
+        delay(pauseTime);
         digitalWrite(motorCCW,HIGH);
-        delay(spin);
+        delay(spinTime);
         digitalWrite(motorCCW, LOW);
-        delay(pause);
+        delay(pauseTime);
   
-        hits = hits - 1;
+        hitsNumber = hitsNumber - 1;
     }
 
     disp.setCursor(0,3);
     disp.print(F("ENXAGUE:   MOLHO "));
-    disp.print(i);
-    disp.print(F("/3"));
+    disp.print(currentStep);
+    disp.print(F("/"));
+    disp.print(totalSteps);
     Serial.print(F("Soak "));
-    Serial.print(i);
-    Serial.println(F(" of 3"));
+    Serial.print(currentStep);
+    Serial.print(F(" of "));
+    Serial.println(totalSteps);
 
-    for(int j=0;j<=soak;j++){
+    for(int j=0;j<=soakTime;j++){
         delay(1000);
     }
      
@@ -715,10 +728,10 @@ void wash(int hits, int spin, int pause, int soak, int i){
 
 
 void normalWashing(){
-    int hits = 60;
-    int spin = 400;
-    int pause = 200;
-    int soak = 300;
+    int hitsNumber = 60;
+    int spinTime = 400;
+    int pauseTime = 200;
+    int soakTime = 300;
     int flushTime = 120; // Additional time to flush the tank after pressure switch is comutted
     int centrifugationTime = 180;
     disp.clear();
@@ -735,8 +748,8 @@ void normalWashing(){
 
     // Estimating cicle time:========================
     // Wash time
-    totalTime = ((float)2*hits*(spin + pause)/(float)1000 + 900); // The first soak step has longer duration
-    totalTime = totalTime+8*((float)2*hits*(spin + pause)/(float)1000 + soak);
+    totalTime = ((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + 900); // The first soakTime step has longer duration
+    totalTime = totalTime+8*((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
     //totalTime = 9.*(2.*60.*(450. + 200.)/1000. + 300.);
     // Wash time + centrifugue time (assuming that the tank takes
     // 60s to empty)
@@ -752,18 +765,18 @@ void normalWashing(){
     disp.setCursor(0,2);
     disp.print(F("Passo 2 de 9        "));
     
-    wash(hits, spin, pause, 900, 1);
-    totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + 900);
+    wash(hitsNumber, spinTime, pauseTime, 900, 1, 3);
+    totalTime = totalTime - ((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + 900);
     updateTime(totalTime);
     
     
   
     
     for (int i=0;i<2;i++){
-        wash(hits, spin, pause, soak, i + 2);
+        wash(hitsNumber, spinTime, pauseTime, soakTime, i + 2, 3);
         
         // Update Time ==============================
-        totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
+        totalTime = totalTime - ((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
         
   
         updateTime(totalTime);
@@ -802,10 +815,10 @@ void normalWashing(){
     disp.setCursor(0,2);
     disp.print(F("Passo 5 de 9        "));
     for (int i=0;i<3;i++){
-        wash(hits, spin, pause, soak, i + 1);
+        wash(hitsNumber, spinTime, pauseTime, soakTime, i + 1,3);
         
         // Update Time ==============================
-        totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
+        totalTime = totalTime - ((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
         updateTime(totalTime);
         //===========================================
   
@@ -839,9 +852,9 @@ void normalWashing(){
     disp.setCursor(0,2);
     disp.print(F("Passo 8 de 9        "));
     for (int i=0;i<3;i++){
-        wash(hits, spin, pause, soak, i + 1);
+        wash(hitsNumber, spinTime, pauseTime, soakTime, i + 1, 3);
         // Update Time ==============================
-        totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
+        totalTime = totalTime - ((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
         updateTime(totalTime);
         
         //===========================================
@@ -862,10 +875,10 @@ void normalWashing(){
 
 void delicateWash()
 {
-    int hits = 60;
-    int spin = 450;
-    int pause = 1000;
-    int soak = 300;
+    int hitsNumber = 60;
+    int spinTime = 450;
+    int pauseTime = 1000;
+    int soakTime = 300;
     int flushTime = 120;
     int centrifugationTime = 180;
     disp.clear();
@@ -884,8 +897,8 @@ void delicateWash()
  
     // Estimating cicle time:========================
     // Wash time
-    totalTime = ((float)2*hits*(spin + pause)/(float)1000 + 900); // The first soak step has longer duration
-    totalTime = totalTime + 8*((float)2*hits*(spin + pause)/(float)1000 + soak);
+    totalTime = ((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + 900); // The first soakTime step has longer duration
+    totalTime = totalTime + 8*((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
     // Wash time + centrifugue time (guessing that the tank takes
     // 120s to empty)
   
@@ -900,14 +913,14 @@ void delicateWash()
     disp.setCursor(0,2);
     disp.print(F("Passo 2 de 9        "));
     
-    wash(hits, spin, pause, 900,1);
-    totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + 900);
+    wash(hitsNumber, spinTime, pauseTime, 900,1,3);
+    totalTime = totalTime - ((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + 900);
     updateTime(totalTime);
       
     for (int i=0;i<2;i++){
-        wash(hits, spin, pause, soak, i + 2);
+        wash(hitsNumber, spinTime, pauseTime, soakTime, i + 2,3);
   
-        totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
+        totalTime = totalTime - ((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
         updateTime(totalTime);
   
   
@@ -939,9 +952,9 @@ void delicateWash()
     disp.setCursor(0,2);
     disp.print(F("Passo 5 de 9        "));
     for (int i=0;i<3;i++){
-        wash(hits, spin, pause, soak, i + 1);
+        wash(hitsNumber, spinTime, pauseTime, soakTime, i + 1, 3);
         
-        totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
+        totalTime = totalTime - ((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
         updateTime(totalTime);
     }
   
@@ -970,9 +983,9 @@ void delicateWash()
     disp.setCursor(0,2);
     disp.print(F("Passo 8 de 9        "));
     for (int i=0;i<3;i++){
-        wash(hits, spin, pause, soak, i + 1);
+        wash(hitsNumber, spinTime, pauseTime, soakTime, i + 1, 3);
         
-        totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
+        totalTime = totalTime - ((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
         updateTime(totalTime);
     } 
   
