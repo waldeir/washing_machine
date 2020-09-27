@@ -705,9 +705,13 @@ int fillTankSoftV(){
 
 void wash(int hits, int spin, int pause, int soak, int i){
     disp.setCursor(0,3);
-    disp.print("ENXAGUE:     BATER ");
+    disp.print("ENXAGUE:   BATER ");
     disp.print(i); 
-    Serial.println("Washing");
+    disp.print("/3");
+    Serial.print("Shaking ");
+    Serial.print(i);
+    Serial.println("of 3");
+    
 
     while (hits > 0){
         digitalWrite(motorCW,HIGH);
@@ -726,6 +730,9 @@ void wash(int hits, int spin, int pause, int soak, int i){
     disp.print("ENXAGUE:   MOLHO ");
     disp.print(i);
     disp.print("/3");
+    Serial.print("Soak ");
+    Serial.print(i);
+    Serial.println("of 3");
 
     for(int j=0;j<=soak;j++){
         delay(1000);
