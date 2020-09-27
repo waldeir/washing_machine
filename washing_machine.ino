@@ -30,7 +30,7 @@ byte arrow[8] = {
 //Variables for work time estimation
 float totalTime; 
 int totalTimeMin;
-int timeTankFlood;
+int timeTankFull;
 
 LiquidCrystal disp(12,  //RS  digital 3
                    13,  //EN  digital 4
@@ -274,9 +274,9 @@ void doubleWash(){
     
     disp.setCursor(0,2);
     disp.print(F("Passo 1 de 6        "));
-    timeTankFlood = fillTank(1);
+    timeTankFull = fillTank(1);
   
-    if (timeTankFlood == -1){
+    if (timeTankFull == -1){
         errorTank();
     }
   
@@ -286,7 +286,7 @@ void doubleWash(){
   
     // Wash time + centrifugue time (guessing that the tank takes
     // 120s to empty)
-    totalTime = totalTime + 2*(flushTime + centrifugationTime) + timeTankFlood;
+    totalTime = totalTime + 2*(flushTime + centrifugationTime) + timeTankFull;
   
     updateTime(totalTime);
     
@@ -308,13 +308,13 @@ void doubleWash(){
     disp.setCursor(0,2);
     disp.print(F("Passo 4 de 6        "));
     
-    timeTankFlood = fillTank(2);
+    timeTankFull = fillTank(2);
     
-    if (timeTankFlood == -1){
+    if (timeTankFull == -1){
         errorTank();
     }
   
-    totalTime = totalTime - timeTankFlood;
+    totalTime = totalTime - timeTankFull;
     updateTime(totalTime);
     
   
@@ -354,9 +354,9 @@ void justSoak(){
     
     disp.setCursor(0,2);
     disp.print(F("Passo 1 de 2        "));
-    timeTankFlood = fillTank(1);
+    timeTankFull = fillTank(1);
   
-    if (timeTankFlood == -1){
+    if (timeTankFull == -1){
         errorTank();
     }
   
@@ -394,9 +394,9 @@ void simpleWash(){
     
     disp.setCursor(0,2);
     disp.print(F("Passo 1 de 3        "));
-    timeTankFlood = fillTank(1);
+    timeTankFull = fillTank(1);
   
-    if (timeTankFlood == -1){
+    if (timeTankFull == -1){
         errorTank();
     }
   
@@ -740,9 +740,9 @@ void normalWashing(){
     
     disp.setCursor(0,2);
     disp.print(F("Passo 1 de 9        "));
-    timeTankFlood = fillTank(1);
+    timeTankFull = fillTank(1);
 
-    if (timeTankFlood == -1){
+    if (timeTankFull == -1){
         errorTank();
     }
 
@@ -757,7 +757,7 @@ void normalWashing(){
     totalTime = totalTime + 3*(flushTime + centrifugationTime);
   
     // Wash time + tankFill
-    totalTime = totalTime + 2*timeTankFlood;
+    totalTime = totalTime + 2*timeTankFull;
   
     updateTime(totalTime);
     //===============================================
@@ -799,15 +799,15 @@ void normalWashing(){
     
     disp.setCursor(0,2);
     disp.print(F("Passo 4 de 9        "));
-    timeTankFlood = fillTank(1);
+    timeTankFull = fillTank(1);
 
-    if (timeTankFlood == -1){
+    if (timeTankFull == -1){
         errorTank();
     }
   
     
     // Update Time ==============================
-    totalTime = totalTime - timeTankFlood;
+    totalTime = totalTime - timeTankFull;
     updateTime(totalTime);
         
     //===========================================
@@ -835,15 +835,15 @@ void normalWashing(){
   
     disp.setCursor(0,2);
     disp.print(F("Passo 7 de 9        "));
-    timeTankFlood = fillTank(2);
+    timeTankFull = fillTank(2);
 
-    if (timeTankFlood == -1){
+    if (timeTankFull == -1){
         errorTank();
     }
 
       
     // Update Time ==============================
-    totalTime = totalTime - timeTankFlood;
+    totalTime = totalTime - timeTankFull;
     updateTime(totalTime);
         
     //===========================================
@@ -873,6 +873,7 @@ void normalWashing(){
     
 }
 
+
 void delicateWash()
 {
     int hitsNumber = 60;
@@ -889,9 +890,9 @@ void delicateWash()
     
     disp.setCursor(0,2);
     disp.print(F("Passo 1 de 9        "));
-    timeTankFlood = fillTank(1);
+    timeTankFull = fillTank(1);
 
-    if (timeTankFlood == -1){
+    if (timeTankFull == -1){
         errorTank();
     }
  
@@ -905,7 +906,7 @@ void delicateWash()
     totalTime = totalTime + 3*(flushTime + centrifugationTime);
   
     // Wash time + tankFill
-    totalTime = totalTime + 2*timeTankFlood;
+    totalTime = totalTime + 2*timeTankFull;
   
     updateTime(totalTime);
     //===============================================
@@ -936,15 +937,15 @@ void delicateWash()
     //===========================================
     disp.setCursor(0,2);
     disp.print(F("Passo 4 de 9        "));
-    timeTankFlood = fillTank(1);
+    timeTankFull = fillTank(1);
 
-    if (timeTankFlood == -1){
+    if (timeTankFull == -1){
         errorTank();
     }
 
     
     // Update Time ==============================
-    totalTime = totalTime - timeTankFlood;
+    totalTime = totalTime - timeTankFull;
     updateTime(totalTime);
         
     //===========================================
@@ -967,15 +968,15 @@ void delicateWash()
   
     disp.setCursor(0,2);
     disp.print(F("Passo 7 de 9        "));
-    timeTankFlood = fillTank(2);
+    timeTankFull = fillTank(2);
 
-    if (timeTankFlood == -1){
+    if (timeTankFull == -1){
         errorTank();
     }
 
     
     // Update Time ==============================
-    totalTime = totalTime - timeTankFlood;
+    totalTime = totalTime - timeTankFull;
     updateTime(totalTime);
         
     //===========================================
