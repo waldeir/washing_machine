@@ -601,30 +601,6 @@ int fillTank(int whatValve){
         digitalWrite(softenerValve,HIGH);
     }
 
-    /* Uncomment this in case of misdetection of tank level occur.
-
-    // Verify if the tank have some water and let the valve open for 
-    // 12 min. This procedure is necessary, because sometimes the 
-    // machine started to shake the tank with no water in it, despite
-    // the fact that the pressostato was not HIGH. A debug procedure showed
-    // that the arduino is randomly ignoring the while loop
-    // responsable for monitoring the pressostato state and proceeding to
-    // shaking the tank. I could not determine the cause of such behavior.
-
-    // A double verification using the if's ensure the the value
-    // was not misread and let the valve open during at least 12 min, which is
-    // suficient to elevate the wather level above the lowest pallets.
-    if(digitalRead(pressostato) == 0){
-        Serial.println(F("Tank is empty, wait for 9 min with soap valve opened."));
-        delay(1000);
-        if(digitalRead(pressostato) == 0){
-        while (millis() - timeStartFlood < 540000){
-        delay(1000);// This while loop waits for 9 min
-        }
-        }
-    }
-    */
-    
 
     // This while loop monitors the pressostato state
     while(millis() - timeStartFlood < maxTimeToWait){
