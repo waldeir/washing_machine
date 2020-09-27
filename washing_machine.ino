@@ -682,7 +682,7 @@ void wash(int hits, int spin, int pause, int soak, int i){
     disp.print(F("/3"));
     Serial.print(F("Shaking "));
     Serial.print(i);
-    Serial.println(F("of 3"));
+    Serial.println(F(" of 3"));
     
 
     while (hits > 0){
@@ -704,7 +704,7 @@ void wash(int hits, int spin, int pause, int soak, int i){
     disp.print(F("/3"));
     Serial.print(F("Soak "));
     Serial.print(i);
-    Serial.println(F("of 3"));
+    Serial.println(F(" of 3"));
 
     for(int j=0;j<=soak;j++){
         delay(1000);
