@@ -579,6 +579,7 @@ void errorTank(){
 
 
 int fillTankSoapV(){
+    const int maxTimeToWait = 1800000;
     unsigned long timeTankFull = 0;
     unsigned long timeStartFlood = millis();
     // fill tank using the soap valve
@@ -613,7 +614,7 @@ int fillTankSoapV(){
     
 
     // This while loop monitors the pressostato state
-    while(millis() - timeStartFlood < 1440000){
+    while(millis() - timeStartFlood < maxTimeToWait){
         if(digitalRead(pressostato) == 1){
             delay(1500);
             Serial.println(F("Is the tank really full?"));
@@ -631,7 +632,7 @@ int fillTankSoapV(){
         //Serial.println(millis() - timeStartFlood);
 
     }
-    if (millis() - timeStartFlood >= 1440000){
+    if (millis() - timeStartFlood >= maxTimeToWait){
         return -1;
     }
 
@@ -656,6 +657,7 @@ int fillTankSoapV(){
 }
 
 int fillTankSoftV(){
+    const int maxTimeToWait = 1800000;
     unsigned long timeTankFull = 0;
     unsigned long timeStartFlood = millis();
     // fill tank using the softener valve
@@ -692,7 +694,7 @@ int fillTankSoftV(){
     
 
     // This while loop monitors the pressostato state
-    while(millis() - timeStartFlood < 1440000){
+    while(millis() - timeStartFlood < maxTimeToWait){
         // Two if's to double check if the pressostato is in short and,
         // ensure the the tank is full.
         if(digitalRead(pressostato) == 1){
@@ -711,7 +713,7 @@ int fillTankSoftV(){
         //Serial.println(millis() - timeStartFlood);
 
     }
-    if (millis() - timeStartFlood >= 1440000){
+    if (millis() - timeStartFlood >= maxTimeToWait){
         return -1;
     }
 
