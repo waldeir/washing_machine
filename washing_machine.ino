@@ -708,6 +708,7 @@ void normalWashing(){
     const int hitsNumber = 60;
     const int spinTime = 400;
     const int pauseTime = 200;
+    const int firstSoakTime = 900;
     const int soakTime = 300;
     const int flushTime = 120; // Additional time to flush the tank after pressure switch is comutted
     const int centrifugationTime = 180;
@@ -725,7 +726,7 @@ void normalWashing(){
 
     // Estimating cicle time:========================
     // Wash time
-    totalTime = ((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + 900); // The first soakTime step has longer duration
+    totalTime = ((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + firstSoakTime); // The first soakTime step has longer duration
     totalTime = totalTime+8*((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
     //totalTime = 9.*(2.*60.*(450. + 200.)/1000. + 300.);
     // Wash time + centrifugue time (assuming that the tank takes
@@ -856,13 +857,13 @@ void delicateWash()
     const int hitsNumber = 60;
     const int spinTime = 450;
     const int pauseTime = 1000;
+    const int firstSoakTime = 900;
     const int soakTime = 300;
     const int flushTime = 120;
     const int centrifugationTime = 180;
     disp.clear();
     disp.setCursor(0,0);
     disp.print(F("LAVAGEM DELICADA"));
-  
   
     
     disp.setCursor(0,2);
@@ -875,7 +876,7 @@ void delicateWash()
  
     // Estimating cicle time:========================
     // Wash time
-    totalTime = ((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + 900); // The first soakTime step has longer duration
+    totalTime = ((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + firstSoakTime); // The first soakTime step has longer duration
     totalTime = totalTime + 8*((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
     // Wash time + centrifugue time (guessing that the tank takes
     // 120s to empty)
