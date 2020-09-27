@@ -582,6 +582,7 @@ void errorTank(){
 int fillTank(int whatValve){
     // Fill the tank with water. If whatValve is 1, it uses the soap valve, if
     // not 1, it uses the softener valve
+    // Return the time spent to fill the tank in seconds
     const int maxTimeToWait = 1800000;
     unsigned long timeTankFull = 0;
     unsigned long timeStartFlood = millis();
@@ -658,8 +659,8 @@ int fillTank(int whatValve){
     }
 
     Serial.print(F("Tempo = "));
-    int timeTankFullInInt = (float)1*timeTankFull/(float)1000;
-    Serial.println(timeTankFullInInt);
+    int timeTankFullInSeconds = (float)1*timeTankFull/(float)1000;
+    Serial.println(timeTankFullInSeconds);
     disp.setCursor(0,3);
     disp.print(F("                    "));
     disp.setCursor(0,3);
@@ -671,7 +672,7 @@ int fillTank(int whatValve){
     Serial.println(dispTank);
 
     delay(5000);
-    return timeTankFullInInt;
+    return timeTankFullInSeconds;
   
 }
 
