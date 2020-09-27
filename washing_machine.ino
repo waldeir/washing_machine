@@ -133,16 +133,14 @@ void menu(){
             if (statusButton1 != buttonStateButton1) {
                 buttonStateButton1 = statusButton1;
   
-                // only toggle the LED if the new button state is HIGH
                 if (buttonStateButton1 == HIGH) {
                 
                     if (meIndex == 6  ){ meIndex = 0;}
                     meIndex++;   
                     printMenu(meIndex);
                       
-                    Serial.print(F("printMenu("));
-                    Serial.print(meIndex);
-                    Serial.println(F(");"));
+                    // Print the current menu to the serial port
+                    printMenuItem(meIndex,1);
   
                 }
             }
@@ -158,29 +156,28 @@ void menu(){
         }
   
         if ((millis() - lastDebounceTime) > debounceDelay) {
-          // whatever the reading is at, it's been there for longer than the debounce
-          // delay, so take it as the actual current state:
+            // whatever the reading is at, it's been there for longer than the debounce
+            // delay, so take it as the actual current state:
   
-          // if the button state has changed:
-          if (statusButton3 != buttonStateButton3) {
-            buttonStateButton3 = statusButton3;
+            // if the button state has changed:
+            if (statusButton3 != buttonStateButton3) {
+                buttonStateButton3 = statusButton3;
   
-          // only toggle the LED if the new button state is HIGH
-          if (buttonStateButton3 == HIGH) {
-              disp.clear();
-              disp.setCursor(0,0);
-              disp.print(F("Programa Selecionado!"));
-              disp.setCursor(0,2);
-              disp.write(byte(0)); //Menu arrow
-              printMenuItem(meIndex);
-              delay(2000);
-              programa = meIndex;
-              Serial.print(F("Program="));
-              Serial.println(programa);
-              break;
-          }
+                if (buttonStateButton3 == HIGH) {
+                    disp.clear();
+                    disp.setCursor(0,0);
+                    disp.print(F("Programa Selecionado!"));
+                    disp.setCursor(0,2);
+                    disp.write(byte(0)); //Menu arrow
+                    printMenuItem(meIndex,0);
+                    delay(2000);
+                    programa = meIndex;
+                    Serial.print(F("Selected Program = "));
+                    printMenuItem(programa,1);
+                    break;
+                }
   
-          }
+            }
         }
         lastButtonStateButton3 = statusButton3; 
           
@@ -218,7 +215,7 @@ void printMenu(int mIndex) {
 
   for (int i=0;i<3;i++){
       disp.setCursor(1,1+i);
-      printMenuItem(mIndex+i);
+      printMenuItem(mIndex+i,0);
   }
   
 
@@ -462,39 +459,62 @@ void justCentrifugue(){
 }
 
 
-
-void printMenuItem(int menuIndex){
+void printMenuItem(int menuIndex, int printToSerial){
     switch (menuIndex){
         case 1:
             disp.print(F("LAVAGEM COMPLETA   "));
+            if ( printToSerial == 1){
+                Serial.println(F("Lavagem Completa"));
+            }
             break;
             
         case 2:
             disp.print(F("APENAS CENTRIFUGAR "));
+            if ( printToSerial == 1){
+                Serial.println(F("Apenas Centrifugar"));
+            }
             break;
   
         case 3:
             disp.print(F("UM ENXAGUE         "));
+            if ( printToSerial == 1 ){
+                Serial.println(F("Um Enxague"));
+            }
             break;
             
         case 4:
             disp.print(F("ENXAGUE DUPLO      "));
+            if ( printToSerial == 1){
+                Serial.println(F("Enxague Duplo"));
+            }
             break;
   
         case 5:
             disp.print(F("DEIXAR DE MOLHO    "));
+            if ( printToSerial == 1){
+                Serial.println(F("Deixar de Molho"));
+            }
             break;
             
         case 6:
             disp.print(F("DELICADA           "));
+            if ( printToSerial == 1){
+                Serial.println(F("Delicada"));
+            }
             break;
   
         case 7:
             disp.print(F("LAVAGEM COMPLETA   "));
+            if ( printToSerial == 1){
+                Serial.println(F("Lavagem Completa"));
+            }
             break;
   
         case 8:
             disp.print(F("APENAS CENTRIFUGAR "));
+            if ( printToSerial == 1){
+                Serial.println(F("Apenas Centrifugar "));
+            }
             break;
     }
 }
