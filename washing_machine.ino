@@ -529,6 +529,11 @@ void centrifuge(){
     while(digitalRead(pressostato) == 1){
         digitalWrite(pump,HIGH);
     }
+    
+    // Pressostato is open, wait for 2 min to empty the tank.
+    Serial.println(F("Pressostato is open"));
+    Serial.println(F("Waiting for 2 min"));
+    
 
     for(int j=0;j<120;j++){
         delay(1000);
