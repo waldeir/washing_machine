@@ -260,11 +260,13 @@ int updateTime(){
         if ( partInSeconds < 10)
             disp.print(F("0"));
         disp.print(partInSeconds);
+        /* Print time to serial
         Serial.print(partInMinutes);
         Serial.print(F(":"));
         if ( partInSeconds < 10 )
             Serial.print(0);
         Serial.println(partInSeconds);
+        */
     }
     return 0;
 }
