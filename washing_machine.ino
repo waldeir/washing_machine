@@ -81,7 +81,7 @@ void menu(){
     // and save RAM. This prevents unstable behavior.
     disp.print(F("  FIRMWARE VERSION  "));
     disp.setCursor(0,2);
-    disp.print(F("      2.0 BETA      "));
+    disp.print(F("        2.0         "));
     delay(2000);
     disp.clear();
     disp.setCursor(0,0);
