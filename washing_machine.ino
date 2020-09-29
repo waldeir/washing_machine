@@ -8,9 +8,9 @@ const int motorCCW = 9; // Motor counter clock wise
 const int soapValve = 7;
 const int softenerValve = 8;
 const int pressostato = 5;
-const int Button1 = 4;
-const int Button2 = 2;
-const int Button3 = 3;
+const int Button1 = 4; // Button Select
+const int Button2 = 2; 
+const int Button3 = 3; // Button Start
 const int beepPin = 11;
 int TankStatus; // 1 is full and 0 is empty
 //int timeTankFull = 0; // Time the tank takes to fill
