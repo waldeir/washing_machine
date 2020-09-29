@@ -590,8 +590,8 @@ int fillTank(int whatValve){
     // Fill the tank with water. If whatValve is 1, it uses the soap valve, if
     // not 1, it uses the softener valve
     // Return the time spent to fill the tank in seconds
-    const int maxTimeToWait = 1800000;
-    unsigned long timeTankFull = 0;
+    const unsigned long maxTimeToWait = 1800000;
+    unsigned long timeTankFullInMilliseconds = 0;
     unsigned long timeStartFlood = millis();
     if( whatValve == 1){
         // fill tank using the soap valve
@@ -616,7 +616,7 @@ int fillTank(int whatValve){
             Serial.println(F("Is the tank really full?"));
 
             if(digitalRead(pressostato) == 1){
-                timeTankFull = millis() - timeStartFlood;
+                timeTankFullInMilliseconds = millis() - timeStartFlood;
                 Serial.println(F("Yes, the tank is full."));
                 break;
             }
@@ -642,13 +642,13 @@ int fillTank(int whatValve){
     }
 
     Serial.print(F("Tempo = "));
-    int timeTankFullInSeconds = (float)1*timeTankFull/(float)1000;
+    int timeTankFullInSeconds = (float)1*timeTankFullInMilliseconds/(float)1000;
     Serial.println(timeTankFullInSeconds);
     disp.setCursor(0,3);
     disp.print(F("                    "));
     disp.setCursor(0,3);
     disp.print(F("TANQUE CHEIO "));
-    int dispTank = (float)1*timeTankFull/(float)60000;
+    int dispTank = (float)1*timeTankFullInMilliseconds/(float)60000;
     disp.print(dispTank);
     disp.print(F("min"));
     Serial.print(F("Tempo in Min: "));
