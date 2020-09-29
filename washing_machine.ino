@@ -469,58 +469,74 @@ void justCentrifugue(){
 void printMenuItem(int menuIndex, int printToSerial){
     switch (menuIndex){
         case 1:
-            disp.print(F("LAVAGEM COMPLETA   "));
             if ( printToSerial == 1){
                 Serial.println(F("Lavagem Completa"));
+            }
+            else{
+                disp.print(F("LAVAGEM COMPLETA   "));
             }
             break;
             
         case 2:
-            disp.print(F("APENAS CENTRIFUGAR "));
             if ( printToSerial == 1){
                 Serial.println(F("Apenas Centrifugar"));
+            }
+            else{
+                disp.print(F("APENAS CENTRIFUGAR "));
             }
             break;
   
         case 3:
-            disp.print(F("UM ENXAGUE         "));
             if ( printToSerial == 1 ){
                 Serial.println(F("Um Enxague"));
+            }
+            else{
+                disp.print(F("UM ENXAGUE         "));
             }
             break;
             
         case 4:
-            disp.print(F("ENXAGUE DUPLO      "));
             if ( printToSerial == 1){
                 Serial.println(F("Enxague Duplo"));
+            }
+            else{
+                disp.print(F("ENXAGUE DUPLO      "));
             }
             break;
   
         case 5:
-            disp.print(F("DEIXAR DE MOLHO    "));
             if ( printToSerial == 1){
                 Serial.println(F("Deixar de Molho"));
+            }
+            else{
+                disp.print(F("DEIXAR DE MOLHO    "));
             }
             break;
             
         case 6:
-            disp.print(F("DELICADA           "));
             if ( printToSerial == 1){
                 Serial.println(F("Delicada"));
+            }
+            else{
+                disp.print(F("DELICADA           "));
             }
             break;
   
         case 7:
-            disp.print(F("LAVAGEM COMPLETA   "));
             if ( printToSerial == 1){
                 Serial.println(F("Lavagem Completa"));
+            }
+            else{
+                disp.print(F("LAVAGEM COMPLETA   "));
             }
             break;
   
         case 8:
-            disp.print(F("APENAS CENTRIFUGAR "));
             if ( printToSerial == 1){
                 Serial.println(F("Apenas Centrifugar "));
+            }
+            else{
+                disp.print(F("APENAS CENTRIFUGAR "));
             }
             break;
     }
