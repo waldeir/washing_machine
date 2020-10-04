@@ -1,4 +1,5 @@
 #include <LiquidCrystal.h>                             // Lib for the lcd display
+#include <TimerOne.h>
 
 
 const int pump = 10;    
@@ -7,9 +8,9 @@ const int motorCCW = 9; // Motor counter clock wise
 const int soapValve = 7;
 const int softenerValve = 8;
 const int pressostato = 5;
-const int Button1 = 4;
-const int Button2 = 2;
-const int Button3 = 3;
+const int Button1 = 4; // Button Select
+const int Button2 = 2; 
+const int Button3 = 3; // Button Start
 const int beepPin = 11;
 int TankStatus; // 1 is full and 0 is empty
 //int timeTankFull = 0; // Time the tank takes to fill
@@ -27,9 +28,9 @@ byte arrow[8] = {
 };
 
 //Variables for work time estimation
-float totalTime; 
-int totalTimeMin;
-int timeTankFlood;
+int totalTime; 
+int timeTankFull;
+int startTimer=0; // start regressive counter if equal to 1;
 
 LiquidCrystal disp(12,  //RS  digital 3
                    13,  //EN  digital 4
@@ -53,6 +54,10 @@ void setup() {
     pinMode(Button3, INPUT);
     pinMode(Button2, INPUT);
     Serial.begin(9600);
+
+    // Setup interrupt
+    Timer1.initialize(1000000);         // initialize timer1, and set a 1 second period
+    Timer1.attachInterrupt(updateTime);  // attaches updateTime() as a timer overflow interrupt
   
 }
 
@@ -72,13 +77,15 @@ void loop() {
 void menu(){
     disp.clear();
     disp.setCursor(0,1);
-    disp.print("  FIRMWARE VERSION  ");
+    // Always use F() in prints to store the strings in PROGAM MEMORY 
+    // and save RAM. This prevents unstable behavior.
+    disp.print(F("  FIRMWARE VERSION  "));
     disp.setCursor(0,2);
-    disp.print("        1.4 BETA    ");
+    disp.print(F("        2.0         "));
     delay(2000);
     disp.clear();
     disp.setCursor(0,0);
-    disp.print("Selecione o programa");
+    disp.print(F("Selecione o programa"));
   
     int menuLength = 5;
     int programa = 2;
@@ -131,16 +138,14 @@ void menu(){
             if (statusButton1 != buttonStateButton1) {
                 buttonStateButton1 = statusButton1;
   
-                // only toggle the LED if the new button state is HIGH
                 if (buttonStateButton1 == HIGH) {
                 
                     if (meIndex == 6  ){ meIndex = 0;}
                     meIndex++;   
                     printMenu(meIndex);
                       
-                    Serial.print("printMenu(");
-                    Serial.print(meIndex);
-                    Serial.println(");");
+                    // Print the current menu to the serial port
+                    printMenuItem(meIndex,1);
   
                 }
             }
@@ -156,29 +161,28 @@ void menu(){
         }
   
         if ((millis() - lastDebounceTime) > debounceDelay) {
-          // whatever the reading is at, it's been there for longer than the debounce
-          // delay, so take it as the actual current state:
+            // whatever the reading is at, it's been there for longer than the debounce
+            // delay, so take it as the actual current state:
   
-          // if the button state has changed:
-          if (statusButton3 != buttonStateButton3) {
-            buttonStateButton3 = statusButton3;
+            // if the button state has changed:
+            if (statusButton3 != buttonStateButton3) {
+                buttonStateButton3 = statusButton3;
   
-          // only toggle the LED if the new button state is HIGH
-          if (buttonStateButton3 == HIGH) {
-              disp.clear();
-              disp.setCursor(0,0);
-              disp.print("Programa Selecionado!");
-              disp.setCursor(0,2);
-              disp.write(byte(0)); //Menu arrow
-              printMenuItem(meIndex);
-              delay(2000);
-              programa = meIndex;
-              Serial.print("Program=");
-              Serial.println(programa);
-              break;
-          }
+                if (buttonStateButton3 == HIGH) {
+                    disp.clear();
+                    disp.setCursor(0,0);
+                    disp.print(F("Programa Selecionado!"));
+                    disp.setCursor(0,2);
+                    disp.write(byte(0)); //Menu arrow
+                    printMenuItem(meIndex,0);
+                    delay(2000);
+                    programa = meIndex;
+                    Serial.print(F("Selected Program = "));
+                    printMenuItem(programa,1);
+                    break;
+                }
   
-          }
+            }
         }
         lastButtonStateButton3 = statusButton3; 
           
@@ -216,39 +220,66 @@ void printMenu(int mIndex) {
 
   for (int i=0;i<3;i++){
       disp.setCursor(1,1+i);
-      printMenuItem(mIndex+i);
+      printMenuItem(mIndex+i,0);
   }
   
 
   disp.setCursor(0,1);
-  //disp.print(">");
+  //disp.print(F(">"));
    disp.write(byte(0));
   disp.setCursor(0,2);
-  disp.print(" ");
+  disp.print(F(" "));
   disp.setCursor(0,3);
-  disp.print(" ");
+  disp.print(F(" "));
 
 }
 
 
+int updateTime(){
+    int partInMinutes;
+    int partInSeconds;
+    
+    
+    if (startTimer == 1 ){
 
-void updateTime(int timeC){
-    totalTimeMin = (float)1*timeC/(float)60;
-    disp.setCursor(0,1);
-    disp.print("                    ");
-    disp.setCursor(0,1);
-    disp.print("T. Restante: ");
-    disp.print(totalTimeMin);
-    disp.print("min");
+        if ( totalTime <= 0 ){
+            startTimer = 0;
+            return 0;
+        }
+
+        totalTime = totalTime - 1;
+
+        partInMinutes = (float)1*totalTime/(float)60;
+        partInSeconds = totalTime % 60;
+        disp.setCursor(0,1);
+        disp.print(F("                    "));
+        disp.setCursor(0,1);
+        disp.print(F("T. Restante: "));
+        disp.print(partInMinutes);
+        disp.print(F(":"));
+        if ( partInSeconds < 10)
+            disp.print(F("0"));
+        disp.print(partInSeconds);
+        /* Print time to serial
+        Serial.print(partInMinutes);
+        Serial.print(F(":"));
+        if ( partInSeconds < 10 )
+            Serial.print(0);
+        Serial.println(partInSeconds);
+        */
+    }
+    return 0;
 }
+
 
 void endBeep(){
+    startTimer = 0; // Disable Time
     disp.setCursor(0,1);
-    disp.print("                    ");
+    disp.print(F("                    "));
     disp.setCursor(0,2);
-    disp.print("    FINALIZADO!     ");
+    disp.print(F("    FINALIZADO!     "));
     disp.setCursor(0,3);
-    disp.print("                    ");
+    disp.print(F("                    "));
     
     for (int i = 0; i<15; i++){
         beep(2000);
@@ -260,76 +291,62 @@ void endBeep(){
 }
 
 void doubleWash(){
-  
-    int totalTime;
-    int hits = 60;
-    int spin = 450;
-    int pause = 200;
-    int soak = 300;
-    int flushTime = 120;
-    int centrifugationTime = 180;
+    const int hitsNumber = 60;
+    const int spinTime = 450;
+    const int pauseTime = 200;
+    const int soakTime = 300;
+    const int flushTime = 130;
+    const int centrifugationTime = 180;
     disp.clear();
     disp.setCursor(0,0);
-    disp.print("ENXAGUE DUPLO");
+    disp.print(F("ENXAGUE DUPLO"));
     
     disp.setCursor(0,2);
-    disp.print("Passo 1 de 6        ");
-    timeTankFlood = fillTankSoapV();
+    disp.print(F("Passo 1 de 6        "));
+    timeTankFull = fillTank(1);
   
-    if (timeTankFlood == -1){
+    if (timeTankFull == -1){
         errorTank();
     }
   
     // Estimating cicle time:
     // Wash time
-    totalTime = 6*((float)2*hits*(spin + pause)/(float)1000 + soak);
+    totalTime = 6*((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
   
     // Wash time + centrifugue time (guessing that the tank takes
-    // 120s to empty)
-    totalTime = totalTime + 2*(flushTime + centrifugationTime) + timeTankFlood;
+    // flushTime seconds to empty)
+    totalTime = totalTime + 2*(flushTime + centrifugationTime) + timeTankFull;
+    startTimer = 1;
   
-    updateTime(totalTime);
     
     disp.setCursor(0,2);
-    disp.print("Passo 2 de 6        ");
+    disp.print(F("Passo 2 de 6        "));
     for (int i=0;i<3;i++){
-        wash(hits, spin, pause, soak, i + 1);
-  
-        totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
-        updateTime(totalTime);
+        wash(hitsNumber, spinTime, pauseTime, soakTime, i + 1,3);
     }
   
     disp.setCursor(0,2);
-    disp.print("Passo 3 de 6        ");
+    disp.print(F("Passo 3 de 6        "));
     centrifuge();
-    totalTime = totalTime - flushTime - centrifugationTime;
-    updateTime(totalTime);
   
     disp.setCursor(0,2);
-    disp.print("Passo 4 de 6        ");
+    disp.print(F("Passo 4 de 6        "));
     
-    timeTankFlood = fillTankSoftV();
+    timeTankFull = fillTank(2);
     
-    if (timeTankFlood == -1){
+    if (timeTankFull == -1){
         errorTank();
     }
   
-    totalTime = totalTime - timeTankFlood;
-    updateTime(totalTime);
-    
-  
     disp.setCursor(0,2);
-    disp.print("Passo 5 de 6        ");
+    disp.print(F("Passo 5 de 6        "));
     for (int i=0;i<3;i++){
-        wash(hits, spin, pause, soak, i + 1);
-  
-        totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
-        updateTime(totalTime);
+        wash(hitsNumber, spinTime, pauseTime, soakTime, i + 1,3);
     }
   
   
     disp.setCursor(0,2);
-    disp.print("Passo 6 de 6        ");
+    disp.print(F("Passo 6 de 6        "));
     centrifuge();
   
   
@@ -344,84 +361,77 @@ void doubleWash(){
 void justSoak(){
 
     int totalTime;
-    int hits = 60;
-    int spin = 450;
-    int pause = 200;
-    int soak = 300;
+    const int hitsNumber = 60;
+    const int spinTime = 450;
+    const int pauseTime = 200;
+    const int soakTime = 300;
     disp.clear();
     disp.setCursor(0,0);
-    disp.print("DEIXAR DE MOLHO     ");
+    disp.print(F("DEIXAR DE MOLHO     "));
     
     disp.setCursor(0,2);
-    disp.print("Passo 1 de 2        ");
-    timeTankFlood = fillTankSoapV();
+    disp.print(F("Passo 1 de 2        "));
+    timeTankFull = fillTank(1);
   
-    if (timeTankFlood == -1){
+    if (timeTankFull == -1){
         errorTank();
     }
   
     // Estimating cicle time:
     // Wash time
-    totalTime = 3*((float)2*hits*(spin + pause)/(float)1000 + soak);
+    totalTime = 3*((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
+    startTimer = 1;
   
-    updateTime(totalTime);
     
     disp.setCursor(0,2);
-    disp.print("Passo 2 de 2        ");
+    disp.print(F("Passo 2 de 2        "));
 
     for (int i=0;i<3;i++){
-        wash(hits, spin, pause, soak, i + 1);
-        totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
-        updateTime(totalTime);
+        wash(hitsNumber, spinTime, pauseTime, soakTime, i + 1,3);
     }
   
     endBeep(); 
-  
 }
 
 void simpleWash(){
 
-    int totalTime;
-    int hits = 60;
-    int spin = 450;
-    int pause = 200;
-    int soak = 300;
-    int flushTime = 120;
-    int centrifugueTime = 180;
+    const int hitsNumber = 60;
+    const int spinTime = 450;
+    const int pauseTime = 200;
+    const int soakTime = 300;
+    const int flushTime = 130;
+    const int centrifugueTime = 180;
     disp.clear();
     disp.setCursor(0,0);
-    disp.print("UM ENXAGUE");
+    disp.print(F("UM ENXAGUE"));
     
     disp.setCursor(0,2);
-    disp.print("Passo 1 de 3        ");
-    timeTankFlood = fillTankSoapV();
+    disp.print(F("Passo 1 de 3        "));
+    timeTankFull = fillTank(1);
   
-    if (timeTankFlood == -1){
+    if (timeTankFull == -1){
         errorTank();
     }
   
     // Estimating cicle time:
     // Wash time
-    totalTime = 3*((float)2*hits*(spin + pause)/(float)1000 + soak);
+    totalTime = 3*((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
   
     // Wash time + centrifugue time (guessing that the tank takes
-    // 120s to empty)
+    // flushTime seconds to empty)
     totalTime = totalTime + flushTime + centrifugueTime;
+    startTimer = 1;
   
-    updateTime(totalTime);
     
     disp.setCursor(0,2);
-    disp.print("Passo 2 de 3        ");
+    disp.print(F("Passo 2 de 3        "));
 
     for (int i=0;i<3;i++){
-        wash(hits, spin, pause, soak, i + 1);
-  
-        totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
-        updateTime(totalTime);
+        wash(hitsNumber, spinTime, pauseTime, soakTime, i + 1,3);
     }
   
     disp.setCursor(0,2);
-    disp.print("Passo 3 de 3        ");
+    disp.print(F("Passo 3 de 3        "));
     centrifuge();
   
     endBeep(); 
@@ -440,81 +450,123 @@ void justCentrifugue(){
 
     disp.clear();
     disp.setCursor(0,0);
-    disp.print("APENAS CENTRIFUGAR   ");
+    disp.print(F("APENAS CENTRIFUGAR   "));
     
     // Estimating cicle time:========================\\
   
-    totalTime = (120   + 180);
+    totalTime = (120  + 180);
+    startTimer = 1;
   
-  
-    updateTime(totalTime);
-    
   
     //===============================================\\
   
     disp.setCursor(0,2);
-    disp.print("Passo 1 de 1        ");
+    disp.print(F("Passo 1 de 1        "));
     centrifuge();
     
     endBeep();
 }
 
 
-
-void printMenuItem(int menuIndex){
+void printMenuItem(int menuIndex, int printToSerial){
     switch (menuIndex){
         case 1:
-            disp.print("LAVAGEM COMPLETA   ");
+            if ( printToSerial == 1){
+                Serial.println(F("Lavagem Completa"));
+            }
+            else{
+                disp.print(F("LAVAGEM COMPLETA   "));
+            }
             break;
             
         case 2:
-            disp.print("APENAS CENTRIFUGAR ");
+            if ( printToSerial == 1){
+                Serial.println(F("Apenas Centrifugar"));
+            }
+            else{
+                disp.print(F("APENAS CENTRIFUGAR "));
+            }
             break;
   
         case 3:
-            disp.print("UM ENXAGUE         ");
+            if ( printToSerial == 1 ){
+                Serial.println(F("Um Enxague"));
+            }
+            else{
+                disp.print(F("UM ENXAGUE         "));
+            }
             break;
             
         case 4:
-            disp.print("ENXAGUE DUPLO      ");
+            if ( printToSerial == 1){
+                Serial.println(F("Enxague Duplo"));
+            }
+            else{
+                disp.print(F("ENXAGUE DUPLO      "));
+            }
             break;
   
         case 5:
-            disp.print("DEIXAR DE MOLHO    ");
+            if ( printToSerial == 1){
+                Serial.println(F("Deixar de Molho"));
+            }
+            else{
+                disp.print(F("DEIXAR DE MOLHO    "));
+            }
             break;
             
         case 6:
-            disp.print("DELICADA           ");
+            if ( printToSerial == 1){
+                Serial.println(F("Delicada"));
+            }
+            else{
+                disp.print(F("DELICADA           "));
+            }
             break;
   
         case 7:
-            disp.print("LAVAGEM COMPLETA   ");
+            if ( printToSerial == 1){
+                Serial.println(F("Lavagem Completa"));
+            }
+            else{
+                disp.print(F("LAVAGEM COMPLETA   "));
+            }
             break;
   
         case 8:
-            disp.print("APENAS CENTRIFUGAR ");
+            if ( printToSerial == 1){
+                Serial.println(F("Apenas Centrifugar "));
+            }
+            else{
+                disp.print(F("APENAS CENTRIFUGAR "));
+            }
             break;
     }
 }
  
 void centrifuge(){
-    Serial.println("Flushing the tank");
+    Serial.println(F("Flushing the tank"));
     disp.setCursor(0,3);
-    disp.print("ESVAZIANDO O TANQUE ");
+    disp.print(F("ESVAZIANDO O TANQUE "));
   
     digitalWrite(pump,HIGH); 
 
     while(digitalRead(pressostato) == 1){
         digitalWrite(pump,HIGH);
     }
+    
+    // Pressostato is open, wait for 2 min to empty the tank.
+    Serial.println(F("Pressostato is open"));
+    Serial.println(F("Waiting for 2 min"));
+    
 
     for(int j=0;j<120;j++){
         delay(1000);
     }
 
     disp.setCursor(0,3);
-    disp.print("   CENTRIFUGANDO    ");
-    Serial.println("Centrifugation");
+    disp.print(F("   CENTRIFUGANDO    "));
+    Serial.println(F("Centrifugation"));
     
     digitalWrite(motorCCW,HIGH);
 
@@ -523,21 +575,22 @@ void centrifuge(){
     }
 
     digitalWrite(motorCCW,LOW);
-    Serial.println("End of centrifugation");
+    Serial.println(F("End of centrifugation"));
     digitalWrite(pump,LOW);
 }
 
 void errorTank(){
+    startTimer = 0; // Disable the timer
     digitalWrite(soapValve,LOW);
     digitalWrite(softenerValve,LOW);
     disp.clear();
     disp.setCursor(0,0);
-    disp.print("       ERRO!");
-    Serial.println("Error: Tank is tanking too long to fill!");
+    disp.print(F("       ERRO!"));
+    Serial.println(F("Error: Tank is tanking too long to fill!"));
     disp.setCursor(0,1);
-    disp.print("Tanque demorando");
+    disp.print(F("Tanque demorando"));
     disp.setCursor(0,2);
-    disp.print("para encher!");
+    disp.print(F("para encher!"));
   
     for (int i = 0;i<20;i++){
         beep(500);
@@ -551,181 +604,124 @@ void errorTank(){
 
 
 
-int fillTankSoapV(){
-    unsigned long timeTankFull = 0;
+int fillTank(int whatValve){
+    // Fill the tank with water. If whatValve is 1, it uses the soap valve, if
+    // not 1, it uses the softener valve
+    // Return the time spent to fill the tank in seconds
+    const unsigned long maxTimeToWait = 1800000;
+    unsigned long timeTankFullInMilliseconds = 0;
     unsigned long timeStartFlood = millis();
-    // fill tank using the soap valve
-    Serial.println("Flooding the tank");
-    disp.setCursor(0,3);
-    disp.print("INUNDANDO O TANQUE  ");
-    digitalWrite(soapValve,HIGH);
-
-    // Verify if the tank have some water and let the valve open for 
-    // 12 min. This procedure is necessary, because sometimes the 
-    // machine started to shake the tank with no water in it, despite
-    // the fact that the pressostato was not HIGH. A debug procedure showed
-    // that the arduino is randomly ignoring the while loop
-    // responsable for monitoring the pressostato state and proceeding to
-    // shaking the tank. I could not determine the cause of such behavior.
-
-    // A double verification using the if's ensure the the value
-    // was not misread and let the valve open during at least 12 min, which is
-    // suficient to elevate the wather level above the lowest pallets.
-    if(pressostato == 0){
-        delay(1000);
-        if(digitalRead(pressostato) == 0){
-        while (millis() - timeStartFlood < 720000){
-        delay(1000);// This while loop waits for 12 min
-        }
-        }
+    if( whatValve == 1){
+        // fill tank using the soap valve
+        disp.setCursor(0,3);
+        Serial.println(F("Flooding the tank"));
+        disp.print(F("INUNDANDO O TANQUE  "));
+        digitalWrite(soapValve,HIGH);
+    }
+    else {
+        // fill tank using the softener valve
+        Serial.println(F("Opening softener valve"));
+        disp.setCursor(0,3);
+        disp.print(F("COLOCANDO AMACIANTE "));
+        digitalWrite(softenerValve,HIGH);
     }
 
-    
 
     // This while loop monitors the pressostato state
-    while(millis() - timeStartFlood < 1440000){
+    while(millis() - timeStartFlood < maxTimeToWait){
         if(digitalRead(pressostato) == 1){
             delay(1500);
-            Serial.println("Is the tank really full?");
+            Serial.println(F("Is the tank really full?"));
 
             if(digitalRead(pressostato) == 1){
-                timeTankFull = millis() - timeStartFlood;
-                Serial.println("Yes, the tank is full.");
+                timeTankFullInMilliseconds = millis() - timeStartFlood;
+                Serial.println(F("Yes, the tank is full."));
                 break;
             }
             else{
-                Serial.println("No, it is not.");
+                Serial.println(F("No, it is not."));
                 continue;
             }
 	}
         //Serial.println(millis() - timeStartFlood);
 
     }
-    if (millis() - timeStartFlood >= 1440000){
+    if (millis() - timeStartFlood >= maxTimeToWait){
         return -1;
     }
 
-    digitalWrite(soapValve,LOW);
-    Serial.println("Closing soap valve");
-    Serial.print("Tempo = ");
-    int timeTankFullInInt = (float)1*timeTankFull/(float)1000;
-    Serial.println(timeTankFullInInt);
+    if ( whatValve == 1) {
+        digitalWrite(soapValve,LOW);
+        Serial.println(F("Closing soap valve"));
+    }
+    else{
+        digitalWrite(softenerValve,LOW);
+        Serial.println(F("Closing softener valve"));
+    }
+
+    Serial.print(F("Tempo = "));
+    int timeTankFullInSeconds = (float)1*timeTankFullInMilliseconds/(float)1000;
+    Serial.println(timeTankFullInSeconds);
     disp.setCursor(0,3);
-    disp.print("                    ");
+    disp.print(F("                    "));
     disp.setCursor(0,3);
-    disp.print("TANQUE CHEIO ");
-    int dispTank = (float)1*timeTankFull/(float)60000;
+    disp.print(F("TANQUE CHEIO "));
+    int dispTank = (float)1*timeTankFullInMilliseconds/(float)60000;
     disp.print(dispTank);
-    disp.print("min");
-    Serial.print("Tempo in Min: ");
+    disp.print(F("min"));
+    Serial.print(F("Tempo in Min: "));
     Serial.println(dispTank);
 
     delay(5000);
-    return timeTankFullInInt;
+    return timeTankFullInSeconds;
   
 }
 
-int fillTankSoftV(){
-    unsigned long timeTankFull = 0;
-    unsigned long timeStartFlood = millis();
-    // fill tank using the softener valve
-    Serial.println("Opening softener valve");
+
+void wash(int hitsNumber, int spinTime, int pauseTime, int soakTime, int currentStep, int totalSteps){
+    // spinTime and pauseTime determine the behavior of the blades and are in
+    // milliseconds
+
+    // soakTime is in seconds
+    
+    // totalSteps can not have more than one digit, because that would overflow
+    // the LCD display
+
     disp.setCursor(0,3);
-    disp.print("COLOCANDO AMACIANTE ");
-    digitalWrite(softenerValve,HIGH);
-
-    // Verify if the tank have some water and let the valve open for 
-    // 12 min. This procedure is necessary, because sometimes the 
-    // machine started to shake the tank with no water in it, despite
-    // the fact that the pressostato was not HIGH. A debug procedure showed
-    // that the arduino is randomly ignoring the while loop
-    // responsable for monitoring the pressostato state and proceeding to
-    // shaking the tank. I could not determine the cause of such behavior.
-
-    // A double verification using the if's ensure the the value
-    // was not misread and let the valve open during at least 12 min, which is
-    // suficient to elevate the wather level above the lowest pallets.
-    if(pressostato == 0){
-        delay(1000);
-        if(digitalRead(pressostato) == 0){
-        while (millis() - timeStartFlood < 720000){
-        delay(1000);// This while loop waits for 12 min
-        }
-        }
-    }
-
+    disp.print(F("ENXAGUE:   BATER "));
+    disp.print(currentStep); 
+    disp.print(F("/"));
+    disp.print(totalSteps);
+    Serial.print(F("Shaking "));
+    Serial.print(currentStep);
+    Serial.print(F(" of "));
+    Serial.println(totalSteps);
     
 
-    // This while loop monitors the pressostato state
-    while(millis() - timeStartFlood < 1440000){
-        // Two if's to double check if the pressostato is in short and,
-        // ensure the the tank is full.
-        if(digitalRead(pressostato) == 1){
-            delay(1000);
-            Serial.println("Is the tank really full?");
-
-            if(digitalRead(pressostato) == 1){
-                timeTankFull = millis() - timeStartFlood;
-                Serial.println("Yes, the tank is full");
-                break;
-            }
-            else{
-                continue;
-            }
-	}
-        //Serial.println(millis() - timeStartFlood);
-
-    }
-    if (millis() - timeStartFlood >= 1440000){
-        return -1;
-    }
-
-  
-    
-    digitalWrite(softenerValve,LOW);
-    Serial.println("Closing soap valve");
-    Serial.print("Tempo = ");
-    int timeTankFullInInt = (float)1*timeTankFull/(float)1000;
-    Serial.println(timeTankFullInInt);  
-    disp.setCursor(0,3);
-    disp.print("                    ");
-    disp.setCursor(0,3);
-    disp.print("TANQUE CHEIO ");
-    int dispTank = (float)1*timeTankFull/(float)60000;
-    disp.print(dispTank);
-    disp.print("min");
-    delay(1000);
-    
-    timeTankFullInInt++;
-    return timeTankFullInInt;
-  
-}
-
-void wash(int hits, int spin, int pause, int soak, int i){
-    disp.setCursor(0,3);
-    disp.print("ENXAGUE:     BATER ");
-    disp.print(i); 
-    Serial.println("Washing");
-
-    while (hits > 0){
+    while (hitsNumber > 0){
         digitalWrite(motorCW,HIGH);
-        delay(spin);
+        delay(spinTime);
         digitalWrite(motorCW,LOW);
-        delay(pause);
+        delay(pauseTime);
         digitalWrite(motorCCW,HIGH);
-        delay(spin);
+        delay(spinTime);
         digitalWrite(motorCCW, LOW);
-        delay(pause);
+        delay(pauseTime);
   
-        hits = hits - 1;
+        hitsNumber = hitsNumber - 1;
     }
 
     disp.setCursor(0,3);
-    disp.print("ENXAGUE:   MOLHO ");
-    disp.print(i);
-    disp.print("/3");
+    disp.print(F("ENXAGUE:   MOLHO "));
+    disp.print(currentStep);
+    disp.print(F("/"));
+    disp.print(totalSteps);
+    Serial.print(F("Soak "));
+    Serial.print(currentStep);
+    Serial.print(F(" of "));
+    Serial.println(totalSteps);
 
-    for(int j=0;j<=soak;j++){
+    for(int j=0;j<=soakTime;j++){
         delay(1000);
     }
      
@@ -734,274 +730,188 @@ void wash(int hits, int spin, int pause, int soak, int i){
 
 
 void normalWashing(){
-    int hits = 60;
-    int spin = 400;
-    int pause = 200;
-    int soak = 300;
-    int flushTime = 120; // Additional time to flush the tank after pressure switch is comutted
-    int centrifugationTime = 180;
+    const int hitsNumber = 60;
+    const int spinTime = 400;
+    const int pauseTime = 200;
+    const int firstSoakTime = 900;
+    const int soakTime = 300;
+    const int flushTime = 130; // Additional time to flush the tank after pressure switch is comutted
+    const int centrifugationTime = 180;
     disp.clear();
     disp.setCursor(0,0);
-    disp.print("LAVAGEM COMPLETA    ");
+    disp.print(F("LAVAGEM COMPLETA    "));
     
     disp.setCursor(0,2);
-    disp.print("Passo 1 de 9        ");
-    timeTankFlood = fillTankSoapV();
+    disp.print(F("Passo 1 de 9        "));
+    timeTankFull = fillTank(1);
 
-    if (timeTankFlood == -1){
+    if (timeTankFull == -1){
         errorTank();
     }
 
     // Estimating cicle time:========================
     // Wash time
-    totalTime = ((float)2*hits*(spin + pause)/(float)1000 + 900); // The first soak step has longer duration
-    totalTime = totalTime+8*((float)2*hits*(spin + pause)/(float)1000 + soak);
+    totalTime = ((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + firstSoakTime); // The first soakTime step has longer duration
+    totalTime = totalTime+8*((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
     //totalTime = 9.*(2.*60.*(450. + 200.)/1000. + 300.);
     // Wash time + centrifugue time (assuming that the tank takes
-    // 60s to empty)
+    // flushTime seconds to empty)
   
     totalTime = totalTime + 3*(flushTime + centrifugationTime);
   
-    // Wash time + tankFill
-    totalTime = totalTime + 2*timeTankFlood;
+    // wash() time + time taken to fill the tank
+    totalTime = totalTime + 2*timeTankFull;
+    startTimer = 1;
   
-    updateTime(totalTime);
-    //===============================================
     
     disp.setCursor(0,2);
-    disp.print("Passo 2 de 9        ");
-    
-    wash(hits, spin, pause, 900, 1);
-    totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + 900);
-    updateTime(totalTime);
-    
+    disp.print(F("Passo 2 de 9        "));
     
   
+    // The first soakTime step has longer duration
+    wash(hitsNumber, spinTime, pauseTime, firstSoakTime, 1, 3);
     
     for (int i=0;i<2;i++){
-        wash(hits, spin, pause, soak, i + 2);
-        
-        // Update Time ==============================
-        totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
-        
-  
-        updateTime(totalTime);
-        
-        //===========================================
-  
-  
-        
+        wash(hitsNumber, spinTime, pauseTime, soakTime, i + 2, 3);
     }
   
     disp.setCursor(0,2);
-    disp.print("Passo 3 de 9        ");
+    disp.print(F("Passo 3 de 9        "));
     centrifuge();
   
-    // Update Time ==============================
-    totalTime = totalTime - (flushTime + centrifugationTime);
-    updateTime(totalTime);
-        
-    //===========================================
-    
     disp.setCursor(0,2);
-    disp.print("Passo 4 de 9        ");
-    timeTankFlood = fillTankSoapV();
+    disp.print(F("Passo 4 de 9        "));
+    timeTankFull = fillTank(1);
 
-    if (timeTankFlood == -1){
+    if (timeTankFull == -1){
         errorTank();
     }
   
     
-    // Update Time ==============================
-    totalTime = totalTime - timeTankFlood;
-    updateTime(totalTime);
-        
-    //===========================================
-    
     disp.setCursor(0,2);
-    disp.print("Passo 5 de 9        ");
+    disp.print(F("Passo 5 de 9        "));
     for (int i=0;i<3;i++){
-        wash(hits, spin, pause, soak, i + 1);
+        wash(hitsNumber, spinTime, pauseTime, soakTime, i + 1,3);
         
-        // Update Time ==============================
-        totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
-        updateTime(totalTime);
-        //===========================================
-  
     }
   
     disp.setCursor(0,2);
-    disp.print("Passo 6 de 9        ");
+    disp.print(F("Passo 6 de 9        "));
     centrifuge();
-    // Update Time ==============================
-    totalTime = totalTime - (flushTime + centrifugationTime);
-    updateTime(totalTime);
-        
-    //===========================================
   
     disp.setCursor(0,2);
-    disp.print("Passo 7 de 9        ");
-    timeTankFlood = fillTankSoftV();
+    disp.print(F("Passo 7 de 9        "));
+    timeTankFull = fillTank(2);
 
-    if (timeTankFlood == -1){
+    if (timeTankFull == -1){
         errorTank();
     }
 
       
-    // Update Time ==============================
-    totalTime = totalTime - timeTankFlood;
-    updateTime(totalTime);
-        
-    //===========================================
-  
-  
     disp.setCursor(0,2);
-    disp.print("Passo 8 de 9        ");
+    disp.print(F("Passo 8 de 9        "));
     for (int i=0;i<3;i++){
-        wash(hits, spin, pause, soak, i + 1);
-        // Update Time ==============================
-        totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
-        updateTime(totalTime);
-        
-        //===========================================
-        
+        wash(hitsNumber, spinTime, pauseTime, soakTime, i + 1, 3);
   
     } 
   
     disp.setCursor(0,2);
-    disp.print("Passo 9 de 9        ");
+    disp.print(F("Passo 9 de 9        "));
     centrifuge();
   
     endBeep();
   
-  
-    
-    
 }
+
 
 void delicateWash()
 {
-    int hits = 60;
-    int spin = 450;
-    int pause = 1000;
-    int soak = 300;
-    int flushTime = 120;
-    int centrifugationTime = 180;
+    const int hitsNumber = 60;
+    const int spinTime = 450;
+    const int pauseTime = 1000;
+    const int firstSoakTime = 900;
+    const int soakTime = 300;
+    const int flushTime = 130;
+    const int centrifugationTime = 180;
     disp.clear();
     disp.setCursor(0,0);
-    disp.print("LAVAGEM DELICADA");
-  
+    disp.print(F("LAVAGEM DELICADA"));
   
     
     disp.setCursor(0,2);
-    disp.print("Passo 1 de 9        ");
-    timeTankFlood = fillTankSoapV();
+    disp.print(F("Passo 1 de 9        "));
+    timeTankFull = fillTank(1);
 
-    if (timeTankFlood == -1){
+    if (timeTankFull == -1){
         errorTank();
     }
  
     // Estimating cicle time:========================
     // Wash time
-    totalTime = ((float)2*hits*(spin + pause)/(float)1000 + 900); // The first soak step has longer duration
-    totalTime = totalTime + 8*((float)2*hits*(spin + pause)/(float)1000 + soak);
+    totalTime = ((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + firstSoakTime); // The first soakTime step has longer duration
+    totalTime = totalTime + 8*((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
     // Wash time + centrifugue time (guessing that the tank takes
-    // 120s to empty)
+    // flushTime seconds to empty)
   
     totalTime = totalTime + 3*(flushTime + centrifugationTime);
   
     // Wash time + tankFill
-    totalTime = totalTime + 2*timeTankFlood;
+    totalTime = totalTime + 2*timeTankFull;
+    startTimer = 1;
   
-    updateTime(totalTime);
-    //===============================================
     
     disp.setCursor(0,2);
-    disp.print("Passo 2 de 9        ");
+    disp.print(F("Passo 2 de 9        "));
     
-    wash(hits, spin, pause, 900,1);
-    totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + 900);
-    updateTime(totalTime);
+    wash(hitsNumber, spinTime, pauseTime, firstSoakTime,1,3);
       
     for (int i=0;i<2;i++){
-        wash(hits, spin, pause, soak, i + 2);
-  
-        totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
-        updateTime(totalTime);
-  
-  
+        wash(hitsNumber, spinTime, pauseTime, soakTime, i + 2,3);
     }
   
     disp.setCursor(0,2);
-    disp.print("Passo 3 de 9        ");
+    disp.print(F("Passo 3 de 9        "));
     centrifuge();
   
-    // Update Time ==============================
-    totalTime = totalTime - (flushTime + centrifugationTime);
-    updateTime(totalTime);
-    //===========================================
     disp.setCursor(0,2);
-    disp.print("Passo 4 de 9        ");
-    timeTankFlood = fillTankSoapV();
+    disp.print(F("Passo 4 de 9        "));
+    timeTankFull = fillTank(1);
 
-    if (timeTankFlood == -1){
+    if (timeTankFull == -1){
         errorTank();
     }
 
     
-    // Update Time ==============================
-    totalTime = totalTime - timeTankFlood;
-    updateTime(totalTime);
-        
-    //===========================================
-    
     disp.setCursor(0,2);
-    disp.print("Passo 5 de 9        ");
+    disp.print(F("Passo 5 de 9        "));
     for (int i=0;i<3;i++){
-        wash(hits, spin, pause, soak, i + 1);
-        
-        totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
-        updateTime(totalTime);
+        wash(hitsNumber, spinTime, pauseTime, soakTime, i + 1, 3);
     }
   
     disp.setCursor(0,2);
-    disp.print("Passo 6 de 9        ");
+    disp.print(F("Passo 6 de 9        "));
     centrifuge();
-    // Update Time ==============================
-    totalTime = totalTime - (flushTime + centrifugationTime);
-    updateTime(totalTime);
   
     disp.setCursor(0,2);
-    disp.print("Passo 7 de 9        ");
-    timeTankFlood = fillTankSoftV();
+    disp.print(F("Passo 7 de 9        "));
+    timeTankFull = fillTank(2);
 
-    if (timeTankFlood == -1){
+    if (timeTankFull == -1){
         errorTank();
     }
 
     
-    // Update Time ==============================
-    totalTime = totalTime - timeTankFlood;
-    updateTime(totalTime);
-        
-    //===========================================
-  
     disp.setCursor(0,2);
-    disp.print("Passo 8 de 9        ");
+    disp.print(F("Passo 8 de 9        "));
     for (int i=0;i<3;i++){
-        wash(hits, spin, pause, soak, i + 1);
-        
-        totalTime = totalTime - ((float)2*hits*(spin + pause)/(float)1000 + soak);
-        updateTime(totalTime);
+        wash(hitsNumber, spinTime, pauseTime, soakTime, i + 1, 3);
     } 
   
     disp.setCursor(0,2);
-    disp.print("Passo 9 de 9        ");
+    disp.print(F("Passo 9 de 9        "));
     centrifuge();
   
     endBeep();
-  
-  
     
   }
   
