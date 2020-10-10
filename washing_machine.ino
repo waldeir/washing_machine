@@ -608,7 +608,7 @@ int fillTank(int whatValve){
     // Fill the tank with water. If whatValve is 1, it uses the soap valve, if
     // not 1, it uses the softener valve
     // Return the time spent to fill the tank in seconds
-    const unsigned long maxTimeToWait = 1800000;
+    const unsigned long maxTimeToWait = 2100000;
     unsigned long timeTankFullInMilliseconds = 0;
     unsigned long timeStartFlood = millis();
     if( whatValve == 1){
