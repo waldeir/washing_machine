@@ -472,7 +472,7 @@ void printMenuItem(int menuIndex, int printToSerial){
     switch (menuIndex){
         case 1:
             if ( printToSerial == 1){
-                Serial.println(F("Lavagem Completa"));
+                Serial.println(F("Normal Wash"));
             }
             else{
                 disp.print(F("LAVAGEM COMPLETA   "));
@@ -481,7 +481,7 @@ void printMenuItem(int menuIndex, int printToSerial){
             
         case 2:
             if ( printToSerial == 1){
-                Serial.println(F("Apenas Centrifugar"));
+                Serial.println(F("just centrifuge"));
             }
             else{
                 disp.print(F("APENAS CENTRIFUGAR "));
@@ -490,7 +490,7 @@ void printMenuItem(int menuIndex, int printToSerial){
   
         case 3:
             if ( printToSerial == 1 ){
-                Serial.println(F("Um Enxague"));
+                Serial.println(F("Simple Wash"));
             }
             else{
                 disp.print(F("UM ENXAGUE         "));
@@ -499,7 +499,7 @@ void printMenuItem(int menuIndex, int printToSerial){
             
         case 4:
             if ( printToSerial == 1){
-                Serial.println(F("Enxague Duplo"));
+                Serial.println(F("Double Wash"));
             }
             else{
                 disp.print(F("ENXAGUE DUPLO      "));
@@ -508,7 +508,7 @@ void printMenuItem(int menuIndex, int printToSerial){
   
         case 5:
             if ( printToSerial == 1){
-                Serial.println(F("Deixar de Molho"));
+                Serial.println(F("Just Soak"));
             }
             else{
                 disp.print(F("DEIXAR DE MOLHO    "));
@@ -517,7 +517,7 @@ void printMenuItem(int menuIndex, int printToSerial){
             
         case 6:
             if ( printToSerial == 1){
-                Serial.println(F("Delicada"));
+                Serial.println(F("Delicate Wash"));
             }
             else{
                 disp.print(F("DELICADA           "));
@@ -526,7 +526,7 @@ void printMenuItem(int menuIndex, int printToSerial){
   
         case 7:
             if ( printToSerial == 1){
-                Serial.println(F("Lavagem Completa"));
+                Serial.println(F("Normal Wash"));
             }
             else{
                 disp.print(F("LAVAGEM COMPLETA   "));
@@ -535,7 +535,7 @@ void printMenuItem(int menuIndex, int printToSerial){
   
         case 8:
             if ( printToSerial == 1){
-                Serial.println(F("Apenas Centrifugar "));
+                Serial.println(F("Just Centrifugue"));
             }
             else{
                 disp.print(F("APENAS CENTRIFUGAR "));
