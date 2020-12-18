@@ -1,7 +1,10 @@
-# Washing Machine code.
+# Washing Machine code
 
 This is a code intended to control a Colormaq Washing Machine 11 Kg with an
 arduino uno. 
+
+The messages in the 20x4 LCD display are written in Portuguese, but the
+comments and the serial messages are all in English.
 
 ## Schematic
 
