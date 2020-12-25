@@ -7,7 +7,7 @@ const int motorCW =  6; // Motor clock wise
 const int motorCCW = 9; // Motor counter clock wise
 const int soapValve = 7;
 const int softenerValve = 8;
-const int pressostato = 5;
+const int pressureSwitch = 5;
 const int Button1 = 4; // Button Select
 const int Button2 = 2; 
 const int Button3 = 3; // Button Start
@@ -49,7 +49,7 @@ void setup() {
     pinMode(motorCCW, OUTPUT);
     pinMode(soapValve, OUTPUT);
     pinMode(softenerValve, OUTPUT);
-    pinMode(pressostato, INPUT); // Sensor: If HIGH the tank is full
+    pinMode(pressureSwitch, INPUT); // Sensor: If HIGH the tank is full
     pinMode(Button1, INPUT);
     pinMode(Button3, INPUT);
     pinMode(Button2, INPUT);
@@ -85,10 +85,10 @@ void menu(){
     delay(2000);
     disp.clear();
     disp.setCursor(0,0);
-    disp.print(F("Selecione o programa"));
+    disp.print(F("Selecione o program"));
   
     int menuLength = 5;
-    int programa = 2;
+    int program = 2;
     int pointerPos = 1;
     int meIndex = 1;
     int statusButton2;
@@ -176,9 +176,9 @@ void menu(){
                     disp.write(byte(0)); //Menu arrow
                     printMenuItem(meIndex,0);
                     delay(2000);
-                    programa = meIndex;
+                    program = meIndex;
                     Serial.print(F("Selected Program = "));
-                    printMenuItem(programa,1);
+                    printMenuItem(program,1);
                     break;
                 }
   
@@ -190,12 +190,12 @@ void menu(){
   
   
   
-    switch (programa){
+    switch (program){
       case 1: 
           normalWashing();
           break;
       case 2:
-          justCentrifugue();
+          justCentrifuge();
           break;
       case 3:
           simpleWash();
@@ -313,7 +313,7 @@ void doubleWash(){
     // Wash time
     totalTime = 6*((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
   
-    // Wash time + centrifugue time (guessing that the tank takes
+    // Wash time + centrifuge time (guessing that the tank takes
     // flushTime seconds to empty)
     totalTime = totalTime + 2*(flushTime + centrifugationTime) + timeTankFull;
     startTimer = 1;
@@ -400,7 +400,7 @@ void simpleWash(){
     const int pauseTime = 200;
     const int soakTime = 300;
     const int flushTime = 130;
-    const int centrifugueTime = 180;
+    const int centrifugeTime = 180;
     disp.clear();
     disp.setCursor(0,0);
     disp.print(F("UM ENXAGUE"));
@@ -417,9 +417,9 @@ void simpleWash(){
     // Wash time
     totalTime = 3*((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
   
-    // Wash time + centrifugue time (guessing that the tank takes
+    // Wash time + centrifuge time (guessing that the tank takes
     // flushTime seconds to empty)
-    totalTime = totalTime + flushTime + centrifugueTime;
+    totalTime = totalTime + flushTime + centrifugeTime;
     startTimer = 1;
   
     
@@ -446,7 +446,7 @@ void beep(unsigned char delayms){
 }
 
   
-void justCentrifugue(){
+void justCentrifuge(){
 
     disp.clear();
     disp.setCursor(0,0);
@@ -551,12 +551,12 @@ void centrifuge(){
   
     digitalWrite(pump,HIGH); 
 
-    while(digitalRead(pressostato) == 1){
+    while(digitalRead(pressureSwitch) == 1){
         digitalWrite(pump,HIGH);
     }
     
-    // Pressostato is open, wait for 2 min to empty the tank.
-    Serial.println(F("Pressostato is open"));
+    // Press Switch is open, wait for 2 min to empty the tank.
+    Serial.println(F("Press Switch is open"));
     Serial.println(F("Waiting for 2 min"));
     
 
@@ -614,7 +614,7 @@ int fillTank(int whatValve){
     if( whatValve == 1){
         // fill tank using the soap valve
         disp.setCursor(0,3);
-        Serial.println(F("Flooding the tank"));
+        Serial.println(F("Filling the tank"));
         disp.print(F("INUNDANDO O TANQUE  "));
         digitalWrite(soapValve,HIGH);
     }
@@ -627,13 +627,13 @@ int fillTank(int whatValve){
     }
 
 
-    // This while loop monitors the pressostato state
+    // This while loop monitors the pressureSwitch state
     while(millis() - timeStartFlood < maxTimeToWait){
-        if(digitalRead(pressostato) == 1){
+        if(digitalRead(pressureSwitch) == 1){
             delay(1500);
             Serial.println(F("Is the tank really full?"));
 
-            if(digitalRead(pressostato) == 1){
+            if(digitalRead(pressureSwitch) == 1){
                 timeTankFullInMilliseconds = millis() - timeStartFlood;
                 Serial.println(F("Yes, the tank is full."));
                 break;
@@ -659,7 +659,7 @@ int fillTank(int whatValve){
         Serial.println(F("Closing softener valve"));
     }
 
-    Serial.print(F("Tempo = "));
+    Serial.print(F("Time = "));
     int timeTankFullInSeconds = (float)1*timeTankFullInMilliseconds/(float)1000;
     Serial.println(timeTankFullInSeconds);
     disp.setCursor(0,3);
@@ -669,7 +669,7 @@ int fillTank(int whatValve){
     int dispTank = (float)1*timeTankFullInMilliseconds/(float)60000;
     disp.print(dispTank);
     disp.print(F("min"));
-    Serial.print(F("Tempo in Min: "));
+    Serial.print(F("Time in Min: "));
     Serial.println(dispTank);
 
     delay(5000);
@@ -754,7 +754,7 @@ void normalWashing(){
     totalTime = ((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + firstSoakTime); // The first soakTime step has longer duration
     totalTime = totalTime+8*((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
     //totalTime = 9.*(2.*60.*(450. + 200.)/1000. + 300.);
-    // Wash time + centrifugue time (assuming that the tank takes
+    // Wash time + centrifuge time (assuming that the tank takes
     // flushTime seconds to empty)
   
     totalTime = totalTime + 3*(flushTime + centrifugationTime);
@@ -850,7 +850,7 @@ void delicateWash()
     // Wash time
     totalTime = ((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + firstSoakTime); // The first soakTime step has longer duration
     totalTime = totalTime + 8*((float)2*hitsNumber*(spinTime + pauseTime)/(float)1000 + soakTime);
-    // Wash time + centrifugue time (guessing that the tank takes
+    // Wash time + centrifuge time (guessing that the tank takes
     // flushTime seconds to empty)
   
     totalTime = totalTime + 3*(flushTime + centrifugationTime);
